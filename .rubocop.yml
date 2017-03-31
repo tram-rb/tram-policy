@@ -1,0 +1,48 @@
+---
+AllCops:
+  DisplayCopNames:    true
+  DisplayStyleGuide:  true
+  StyleGuideCopsOnly: true
+  TargetRubyVersion:  2.4
+
+Bundler/DuplicatedGem:
+  Enabled: false
+
+Style/CaseEquality:
+  Enabled: false
+
+Style/ClassVars:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/FileName:
+  Exclude:
+    - lib/tram-policy.rb
+
+Style/Lambda:
+  Exclude:
+    - spec/**/*_spec.rb
+
+Style/LambdaCall:
+  Enabled: false
+
+Style/RaiseArgs:
+  EnforcedStyle: compact
+
+Style/Semicolon:
+  Exclude:
+    - spec/**/*_spec.rb
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
