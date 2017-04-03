@@ -19,4 +19,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "rspec", "~> 3.0"
   gem.add_development_dependency "rake", "> 10"
   gem.add_development_dependency "rubocop", "~> 0.42"
+  gem.add_development_dependency "thor", "~> 0.19"
+  gem.add_development_dependency "factory_girl", "~> 4.8"
 end

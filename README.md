@@ -128,7 +128,7 @@ class Article::PublicationPolicy < Tram::Policy
     # Collects errors except warnings from "nested" policy 
     Article::ReadinessPolicy[article].errors.each do |err|
       next if err.level == "warning"
-      errors.add err.message, err.tags.merge { field: "article[#{err.field}]" }
+      errors.add err.to_h.merge { field: "article[#{err.field}]" }
     end
   end
 
@@ -170,13 +170,65 @@ rescue Tram::Policy::ValidationError => error
 end
 ```
 
+## Generators
+
+The gem provides simple tool for scaffolding new policy along with RSpec specification. You
+
+```shell
+$ tram-policy user/readiness_policy user user:name user:emain
+```
+
+This will generate a corresponding class
+
+```ruby
+# app/policies/user/readiness_policy.rb
+class User::ReadinessPolicy < Tram::Policy
+  param  :user
+  option :name,  default: -> { user.name }
+  option :email, default: -> { user.email }
+end
+```
+
+and a specification, compatible to both [RSpec][rspec] and [FactoryGirl][factory-girl]:
+
+```ruby
+# spec/policies/user/readiness_policy_spec.rb
+RSpec.describe User::ReadinessPolicy do
+  let(:user)   { build :user } # <- expected a factory
+  let(:policy) { described_class[user] }
+
+  it { is_expected.to be_valid }
+
+  context "with wrong name" do
+    before { user.name = nil }
+    it { is_expected.to be_invalid_at field: "name" }
+  end
+
+  context "with wrong name" do
+    before { user.email = nil }
+    it { is_expected.to be_invalid_at field: "email" }
+  end
+end
+```
+
+Later you can copy-paste that contexts to provide more edge case for testing your policies.
+
+Notice that RSpec matcher `be_invalid_at` checks at once:
+
+- that an error is added to the policy
+- that the error has given tags
+- that the error is translated to every available locale
+
+and provides full description for the essence of the failure.
+
 ## To Recap
 
 The `Tram::Policy` DSL provides the following methods:
 
-* `.[]` - a syntax sugar for `.new`
 * `.param` and `.option` - class-level methods for policy constructor arguments
 * `.validate` - class-level method to add validators (they will be invoked in the same order as defined)
+* `.[]` - a syntax sugar for `.new`
+
 * `#errors` - returns an enumerable collection of validation errors
 * `#valid?` - checks whether no errors exist
 * `#invalid?` - checks whether some error exists
@@ -191,10 +243,11 @@ Enumerable collection of unique policy `errors` (`Tram::Policy::Errors`) respond
 
 Every instance of `Tram::Policy::Error` supports:
 
-* `message` - the translated message
-* `full_message` - the message with tags info added
-* `tags` - hash of assigned tags
-* `==` - checks whether an error is equal to another one
+* `#tags` - hash of assigned tags
+* `#message` - the translated message
+* `#full_message` - the message with tags info added
+* `#to_h` - hash of tags and a message
+* `#==` - checks whether an error is equal to another one
 * undefined methods treated as tags
 
 The instance of `Tram::Policy::ValidationError` responds to:
@@ -241,3 +294,5 @@ The gem is available as open source under the terms of the [MIT License](http://
 [dry-validation]: http://dry-rb.org/gems/dry-validation/
 [dry-initializer]: http://dry-rb.org/gems/dry-initializer/
 [i18n]: https://github.com/svenfuchs/i18n
+[rspec]: http://rspec.info/
+[factory-girl]: https://github.com/thoughtbot/factory_girl
