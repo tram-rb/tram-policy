@@ -61,10 +61,10 @@ class Article::ReadinessPolicy < Tram::Policy
   end
 
   def text_presence
-    return unless title.empty?
+    return unless text.empty?
     # Adds an error with a translated message. All fields are available
     # both as error tags, and I18n translation options
-    errors.add :empty_subtitle, field: "text", level: "error"
+    errors.add :empty_text, field: "text", level: "error"
   end
 end
 ```
@@ -85,7 +85,7 @@ policy.validate!   # raises Tram::Policy::ValidationError
 
 # Look at errors closer
 policy.errors.count # => 2 (no subtitle, no text)
-policy.errors.filter { |error| error.tags[:field] == "error" }.count # => 1
+policy.errors.filter { |error| error.tags[:level] == "error" }.count # => 1
 policy.errors.filter { |error| error.level == "error" }.count # => 1
 
 # Error messages are already added under special key :message
