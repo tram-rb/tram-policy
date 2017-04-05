@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency "dry-initializer", "~> 1.3"
   gem.add_runtime_dependency "i18n", "~> 0.8"
 
-  gem.add_development_dependency "rspec", "~> 3.0"
+  gem.add_development_dependency "rspec", "~> 3.3"
   gem.add_development_dependency "rake", "> 10"
   gem.add_development_dependency "rubocop", "~> 0.42"
   gem.add_development_dependency "thor", "~> 0.19"
