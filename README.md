@@ -175,7 +175,7 @@ end
 The gem provides simple tool for scaffolding new policy along with RSpec specification.
 
 ```shell
-$ tram-policy user/readiness_policy user user:name user:emain
+$ tram-policy user/readiness_policy user user:name user:email
 ```
 
 This will generate a policy class with specification compatible to both [RSpec][rspec] and [FactoryGirl][factory-girl]:
