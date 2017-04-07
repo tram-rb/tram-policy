@@ -61,4 +61,15 @@ describe Tram::Policy do
       expect(@policy.errors).to be_an_instance_of(Tram::Policy::Errors)
     end
   end
+
+  context 'validate!' do
+    it 'should raise exception if some error exists' do
+      expect { @policy.validate! }.to raise_error(Tram::Policy::ValidationError)
+    end
+
+    it 'should not raise exception if no errors exist' do
+      article = Article.new title: 'title', subtitle: 'subtitle', text: 'text'
+      expect { Article::ReadinessPolicy[article].validate! }.not_to raise_error
+    end
+  end
 end

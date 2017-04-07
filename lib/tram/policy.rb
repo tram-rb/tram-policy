@@ -1,5 +1,6 @@
 require "dry-initializer"
 require "tram/policy/errors"
+require "tram/policy/validation_error"
 
 module Tram
   class Policy
@@ -40,6 +41,11 @@ module Tram
     # Return true if some error exists
     def invalid?
       !valid?
+    end
+
+    # Raises Tram::Policy::ValidationError exception if some error exists
+    def validate!
+      raise Tram::Policy::ValidationError.new(self) if invalid?
     end
 
     private
