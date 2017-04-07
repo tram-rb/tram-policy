@@ -41,4 +41,24 @@ describe Tram::Policy::Error do
       expect(@error.full_message).to eq("Title is empty: {:field=>\"title\", :level=>\"error\"}")
     end
   end
+
+  context '.to_h' do
+    it 'should return hash of tags and a message' do
+      expect(@error.to_h).to eq({message: "Title is empty", field: "title", level: "error"})
+    end
+  end
+
+  context '==' do
+    it 'should check whether an error is equal to another one' do
+      error = Tram::Policy::Error.new(@policy, "Title is empty", field: "title", level: "error")
+      equality = @error == error
+      expect(equality).to be_truthy
+    end
+  end
+
+  context 'undefined methods treated as tags' do
+    it { expect(@error.field).to eq('title') }
+    it { expect(@error.level).to eq('error') }
+    it { expect { @error.time }.to raise_error(NoMethodError) }
+  end
 end
