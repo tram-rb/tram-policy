@@ -1,5 +1,4 @@
 require "dry-initializer"
-require "i18n"
 require "tram/policy/errors"
 
 module Tram

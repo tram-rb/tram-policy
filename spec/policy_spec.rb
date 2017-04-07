@@ -4,6 +4,8 @@ require 'sample_policy'
 
 describe Tram::Policy do
   before(:all) do
+    I18n.available_locales = [:en]
+
     @article = Article.new title: 'A wonderful article', subtitle: '', text: ''
     @policy = Article::ReadinessPolicy[@article]
   end
