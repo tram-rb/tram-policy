@@ -110,11 +110,11 @@ RSpec.describe Dummy::ReadinessPolicy do
 
   context "with wrong title" do
     before { article.title = nil }
-    it { is_expected.to be_invalid }
+    it { is_expected.to be_invalid_at field: "title" }
   end
 
   context "with wrong text" do
     before { article.text = nil }
-    it { is_expected.to be_invalid }
+    it { is_expected.to be_invalid_at field: "text", level: "error" }
   end
 end
