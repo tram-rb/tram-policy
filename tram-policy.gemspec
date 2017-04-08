@@ -10,6 +10,7 @@ Gem::Specification.new do |gem|
   gem.files            = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   gem.test_files       = gem.files.grep(/^spec/)
   gem.extra_rdoc_files = Dir["README.md", "LICENSE", "CHANGELOG.md"]
+  gem.executables << "tram-policy"
 
   gem.required_ruby_version = ">= 2.2"
 

@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+
+def camelize(string)
+  string.split("_").map(&:capitalize).join
+end
+
+policy_name = ARGV[0]
+model_name = ARGV[1]
+attributes = (ARGV[2..-1] || []).map { |attribute| attribute.split(':') }
+
+policy_class_name = policy_name.split("/").map { |part| camelize(part) }.join("::")
+model_class_name = camelize(model_name)
+
+klass = <<~CLASS
+  class #{policy_class_name} < Tram::Policy
+    param :#{model_name}
+CLASS
+
+spec = <<~SPEC
+  RSpec.describe #{policy_class_name} do
+    let(:#{model_name}) { build(:#{model_name}) }
+    let(:policy) { described_class[#{model_name}] }
+
+    it { is_expected.to be_valid }
+SPEC
+
+attributes.each do |(model, attribute)|
+  klass += "  option :#{attribute}, default: -> { #{model}.#{attribute} }\n"
+  spec += <<-SPEC
+
+  context "with wrong #{attribute}" do
+    before { #{model}.#{attribute} = nil }
+    it { is_expected.to be_invalid_at field: "#{attribute}" }
+  end
+  SPEC
+end
+
+klass += "end"
+spec += "end"
+
+puts klass
+puts
+puts spec
+
+
