@@ -14,6 +14,7 @@ class TramPolicyGenerator < Rails::Generators::Base
   def copy_templates
     template "policy.rb", "app/policies/#{file_name}.rb"
     template "policy_spec.rb", "spec/policies/#{file_name}_spec.rb"
+    application 'config.autoload_paths += %W(#{config.root}/app/policies)'
   end
 
   private
