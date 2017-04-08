@@ -9,7 +9,11 @@ module Tram
       end
 
       def add(message, tags)
-        message = translate_message(message, tags) if message.is_a? Symbol
+        message = Error::Message.new(
+          message,
+          translation_scope: policy_i18n_scope,
+          variables: tags
+        )
 
         error = Error.new(message, tags)
         @errors_list << error
@@ -19,21 +23,10 @@ module Tram
         @errors_list.each(&block)
       end
 
-      def messages
-        @errors_list.map(&:message)
-      end
-
-      def full_messages
-        @errors_list.map(&:full_messages)
-      end
-
       private
 
-      def translate_message(message, tags)
-        I18n.t(
-          @policy_class.name.underscore.gsub("::", "/") + "." + message.to_s,
-          tags
-        )
+      def policy_i18n_scope
+        @policy_class.name.underscore.gsub("::", "/")
       end
     end
   end

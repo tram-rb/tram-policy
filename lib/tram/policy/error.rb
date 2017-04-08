@@ -8,6 +8,10 @@ module Tram
         @tags = tags
       end
 
+      def message
+        @message.to_s
+      end
+
       def full_message
         { message => tags }
       end
