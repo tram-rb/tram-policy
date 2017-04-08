@@ -6,7 +6,7 @@ describe Tram::Policy::Error do
     I18n.available_locales = [:en]
     I18n.backend.store_translations(:en, {
       'tram/policy': {
-        empty_text: "Text is empty"
+        empty_text: "Validation %{level}: %{field} is empty"
       }
     })
 
@@ -27,7 +27,7 @@ describe Tram::Policy::Error do
 
     it 'should return default message if message is symbol and translation is missed' do
       error = Tram::Policy::Error.new(@policy, :empty_text, field: "text", level: "error")
-      expect(error.message).to eq("Text is empty")
+      expect(error.message).to eq("Validation error: text is empty")
     end
 
     it 'should return translated message if message is symbol and translation exists' do
