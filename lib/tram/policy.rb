@@ -31,21 +31,26 @@ module Tram
     end
 
     # Return true if no errors exist
-    def valid?
+    def valid?(&block)
       errors.clear
       run_validations!
 
-      @errors.empty?
+      filtered_errors = block ? @errors.reject(&block) : @errors
+      filtered_errors.empty?
     end
 
     # Return true if some error exists
-    def invalid?
-      !valid?
+    def invalid?(&block)
+      errors.clear
+      run_validations!
+
+      filtered_errors = block ? @errors.select(&block) : @errors
+      filtered_errors.any?
     end
 
     # Raises Tram::Policy::ValidationError exception if some error exists
-    def validate!
-      raise Tram::Policy::ValidationError.new(self) if invalid?
+    def validate!(&block)
+      raise Tram::Policy::ValidationError.new(self) unless valid?(&block)
     end
 
     # Use for RSpec matcher be_invalid_at

@@ -35,24 +35,22 @@ describe Tram::Policy do
   end
 
   context '.valid?' do
-    it 'should  return false if some error exists' do
-      expect(@policy.valid?).to be_falsey
+    it 'should return false if some error exists' do
+      expect(@policy.valid? { |error| !%w(warning error).include? error.level }).to be_falsey
     end
 
     it 'should return true if no errors exist' do
-      article = Article.new title: 'title', subtitle: 'subtitle', text: 'text'
-      expect(Article::ReadinessPolicy[article].valid?).to be_truthy
+      expect(@policy.valid? { |error| error.level != "disaster" }).to be_truthy
     end
   end
 
   context '.invalid?' do
     it 'should  return true if some error exists' do
-      expect(@policy.invalid?).to be_truthy
+      expect(@policy.invalid? { |error| %w(warning error).include? error.level }).to be_truthy
     end
 
     it 'should return false if no errors exist' do
-      article = Article.new title: 'title', subtitle: 'subtitle', text: 'text'
-      expect(Article::ReadinessPolicy[article].invalid?).to be_falsey
+      expect(@policy.invalid? { |error| error.level == "disaster" }).to be_falsey
     end
   end
 
@@ -64,12 +62,11 @@ describe Tram::Policy do
 
   context 'validate!' do
     it 'should raise exception if some error exists' do
-      expect { @policy.validate! }.to raise_error(Tram::Policy::ValidationError)
+      expect { @policy.validate! { |error| !%w(warning error).include? error.level } }.to raise_error(Tram::Policy::ValidationError)
     end
 
     it 'should not raise exception if no errors exist' do
-      article = Article.new title: 'title', subtitle: 'subtitle', text: 'text'
-      expect { Article::ReadinessPolicy[article].validate! }.not_to raise_error
+      expect { @policy.validate! { |error| error.level != "disaster" } }.not_to raise_error
     end
   end
 
