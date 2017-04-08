@@ -125,10 +125,12 @@ class Article::PublicationPolicy < Tram::Policy
   private
 
   def article_readiness
-    # Collects errors except warnings from "nested" policy 
+    # Collects errors except warnings from "nested" policy
     Article::ReadinessPolicy[article].errors.each do |err|
       next if err.level == "warning"
-      errors.add err.to_h.merge { field: "article[#{err.field}]" }
+      # If symbolic key was provided as message, `#raw_message` returns it, skipping I18n translation.
+      # Otherwise `#raw_message` is equivalent to `#message`
+      errors.add err.raw_message, err.tags.merge { field: "article[#{err.field}]" }
     end
   end
 
@@ -230,13 +232,13 @@ The `Tram::Policy` DSL provides the following methods:
 * `#valid?` - checks whether no errors exist
 * `#invalid?` - checks whether some error exists
 * `#validate!` - raises if some error exist
+* `messages` - returns an array of messages
+* `full_messages` - returns an array of messages with tags info added (used in exception)
 
 Enumerable collection of unique policy `errors` (`Tram::Policy::Errors`) responds to methods:
 
 * `add` - adds an error to the collection
 * `each` - iterates by the set of errors (support other methods of enumerables)
-* `messages` - returns an array of messages
-* `full_messages` - returns an array of messages with tags info added (used in exception)
 
 Every instance of `Tram::Policy::Error` supports:
 

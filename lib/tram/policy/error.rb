@@ -1,7 +1,7 @@
 module Tram
   class Policy
     class Error
-      attr_reader :message, :tags
+      attr_reader :tags
 
       def initialize(message, **tags)
         @message = message
@@ -10,6 +10,10 @@ module Tram
 
       def message
         @message.to_s
+      end
+
+      def raw_message
+        @message.content
       end
 
       def full_message

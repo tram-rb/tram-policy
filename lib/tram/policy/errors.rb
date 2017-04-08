@@ -9,11 +9,13 @@ module Tram
       end
 
       def add(message, tags)
-        message = Error::Message.new(
-          message,
-          translation_scope: policy_i18n_scope,
-          variables: tags
-        )
+        unless message.is_a? Error::Message
+          message = Error::Message.new(
+            message,
+            translation_scope: policy_i18n_scope,
+            variables: tags
+          )
+        end
 
         error = Error.new(message, tags)
         @errors_list << error
