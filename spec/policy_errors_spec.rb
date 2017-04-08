@@ -41,4 +41,11 @@ describe Tram::Policy::Errors do
         "Subtitle is empty: {:field=>\"subtitle\", :level=>\"warning\"}"])
     end
   end
+
+  context '.filter' do
+    it 'should filter errors' do
+      filtered_errors = @errors.filter { |error| error.tags[:level] == "error" }
+      expect(filtered_errors.count).to eq(1)
+    end
+  end
 end

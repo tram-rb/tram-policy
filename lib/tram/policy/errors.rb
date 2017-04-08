@@ -37,6 +37,8 @@ module Tram
       def full_messages
         @errors.map(&:full_message)
       end
+
+      alias filter select
     end
   end
 end
