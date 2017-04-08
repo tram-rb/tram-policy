@@ -11,7 +11,7 @@ module Tram
     end
 
     def errors
-      @errors ||= Errors.new
+      @errors ||= Errors.new(self.class)
     end
 
     def initialize(*args)

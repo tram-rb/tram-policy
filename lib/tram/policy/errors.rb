@@ -3,12 +3,16 @@ module Tram
     class Errors
       include Enumerable
 
-      def initialize
+      def initialize(policy_class)
         @errors_list = []
+        @policy_class = policy_class
       end
 
-      def add(message, options)
-        error = Error.new(message, options)
+      def add(message, tags)
+        if message.is_a? Symbol
+          message = translate_message(message, tags)
+        end
+        error = Error.new(message, tags)
         @errors_list << error
       end
 
@@ -22,6 +26,15 @@ module Tram
 
       def full_messages
         @errors_list.map(&:full_messages)
+      end
+
+      private
+
+      def translate_message(message, tags)
+        I18n.t(
+          @policy_class.name.underscore.gsub("::", "/") + "." + message.to_s,
+          tags
+        )
       end
     end
   end

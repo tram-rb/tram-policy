@@ -3,6 +3,9 @@ require "tram-policy"
 require "factory_girl"
 require "byebug"
 
+I18n.load_path = [File.dirname(__FILE__) + "/locales/en.yml"]
+I18n.locale = :en
+
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
 

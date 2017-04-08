@@ -9,7 +9,7 @@ module Tram
       end
 
       def full_message
-        { message => { field: field, level: level } }
+        { message => tags }
       end
 
       def to_h
@@ -26,11 +26,18 @@ module Tram
       end
 
       def respond_to?(method_name)
-        tags.keys.include? method_name
+        tags_include? method_name
       end
 
       def method_missing(method_name)
-        tags[method_name]
+        return tags[method_name] if tags_include? method_name
+        super
+      end
+
+      private
+
+      def tags_include?(tag)
+        tags.keys.include? tag
       end
     end
   end

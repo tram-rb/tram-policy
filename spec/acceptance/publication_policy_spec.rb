@@ -24,6 +24,14 @@ RSpec.describe Dummy::ReadinessPolicy do
     end
   end
 
+  describe "I18n" do
+    before { article.text = nil }
+    it "should translate message symbol" do
+      expect(subject.messages).to \
+        match_array(["Validation error: text is empty"])
+    end
+  end
+
   describe "#full_messages" do
     before { article.title = nil }
 
