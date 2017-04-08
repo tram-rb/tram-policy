@@ -61,4 +61,22 @@ describe Tram::Policy::Error do
     it { expect(@error.level).to eq('error') }
     it { expect { @error.time }.to raise_error(NoMethodError) }
   end
+
+  context '.missed_translations' do
+    it 'should return empty error if message is string' do
+      expect(@error.missed_translations).to eq(Array.new)
+    end
+
+    it 'should return empty error if message is symbol and there are not missed translations' do
+      error = Tram::Policy::Error.new(@policy, :empty_text, field: "text", level: "error")
+      expect(error.missed_translations).to eq(Array.new)
+    end
+
+    it 'should return array of missed translations if they exist' do
+      I18n.available_locales = [:en, :ru, :de]
+      error = Tram::Policy::Error.new(@policy, :empty_text, field: "text", level: "error")
+      expect(error.missed_translations).to eq(['ru.tram/policy.empty_text', 'de.tram/policy.empty_text'])
+      I18n.available_locales = [:en]
+    end
+  end
 end

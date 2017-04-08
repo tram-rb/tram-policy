@@ -72,4 +72,18 @@ describe Tram::Policy do
       expect { Article::ReadinessPolicy[article].validate! }.not_to raise_error
     end
   end
+
+  context '.invalid_at?' do
+    it 'should return false if policy is valid' do
+      expect(@policy.invalid_at?(field: 'title')).to be_falsey
+    end
+
+    it 'should return messages of errors if policy is invalid' do
+      expect(@policy.invalid_at?(field: 'subtitle')).to eq('Policy is invalid: Subtitle is empty')
+    end
+
+    it 'should point to not translated errors if some translations was missed' do
+      expect(@policy.invalid_at?(field: 'text')).to eq('Policy is invalid: Error translation for missed text. Missed translations: en.article/readiness_policy.empty_subtitle')
+    end
+  end
 end

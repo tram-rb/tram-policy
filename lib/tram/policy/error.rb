@@ -1,4 +1,6 @@
 require "i18n"
+require 'core_ext/string'
+require 'core_ext/hash'
 
 module Tram
   class Policy
@@ -7,7 +9,8 @@ module Tram
 
       def initialize(policy, message, tags)
         @policy = policy
-        @tags = symbolize_keys(tags)
+        @tags = tags.symbolize_keys
+        @initial_message = message
         @message = generate_message(message)
       end
 
@@ -28,11 +31,23 @@ module Tram
         if message.is_a?(String)
           message
         elsif message.is_a?(Symbol)
-          p @policy.class.to_s
-          I18n.t(message, @tags.merge(scope: underscore(@policy.class.name), default: "Error translation for missed text"))
+          I18n.t(message, @tags.merge(scope: i18n_scope, default: "Error translation for missed text"))
         else
           raise ArgumentError.new("Only strings or symbols are allowed")
         end
+      end
+
+      # Return an array of missed translations to every available locale
+      #
+      #   Tram::Policy::Error.new article_policy, :empty_title, field: 'title'
+      #   error.missed_translations # => ['en.article.empty_title', 'ru.article.empty_title']
+      def missed_translations
+        return Array.new unless @initial_message.is_a?(Symbol)
+
+        missed_locales = I18n.available_locales.select do |locale|
+          !I18n.exists?("#{i18n_scope}.#{@initial_message}", locale)
+        end
+        missed_locales.map {|locale| "#{locale}.#{i18n_scope}.#{@initial_message}"}
       end
 
       # Get hash of tags and a message
@@ -59,16 +74,8 @@ module Tram
       end
 
       private
-        def underscore(camel_cased_word)
-          camel_cased_word.gsub(/::/, '/').
-          gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-          gsub(/([a-z\d])([A-Z])/,'\1_\2').
-          tr("-", "_").
-          downcase
-        end
-
-        def symbolize_keys(hash)
-          Hash[hash.map{ |k, v| [k.to_sym, v] }]
+        def i18n_scope
+          @policy.class.name.underscore
         end
     end
   end

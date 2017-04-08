@@ -48,6 +48,33 @@ module Tram
       raise Tram::Policy::ValidationError.new(self) if invalid?
     end
 
+    # Use for RSpec matcher be_invalid_at
+    #
+    # Checks at once:
+    #
+    # * that an error is added to the policy
+    # * that the error has given tags
+    # * that the error is translated to every available locale
+    #
+    # Return description for the essence of the failure if policy is invalid
+    # Return false if policy is valid
+    def invalid_at?(tags)
+      errors.clear
+      run_validations!
+
+      reasons = []
+
+      filtered_errors = errors.select do |error|
+        tags.all? {|tag, value| error.tags[tag].to_s == value.to_s}
+      end
+      reasons.push("Policy is invalid: #{filtered_errors.map(&:message).join(', ')}") if filtered_errors.any?
+
+      missed_translations = filtered_errors.map(&:missed_translations).flatten.compact
+      reasons.push("Missed translations: #{missed_translations.join(', ')}") if missed_translations.any?
+
+      reasons.any? && reasons.join(". ")
+    end
+
     private
       def run_validations!
         self.class.validators.each do |method|
