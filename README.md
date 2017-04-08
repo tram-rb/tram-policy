@@ -13,16 +13,16 @@ Policy Object Pattern
 
 ## Intro
 
-Policy objects are responcible for context-related validation of objects, or mixes of objects. Here **context-related** means a validation doesn't check whether an object is valid by itself, but whether it is valid for some purpose (context). For example, we could ask, is some article is ready (valid) for been published, etc.
+Policy objects are responsible for context-related validation of objects, or mixes of objects. Here **context-related** means a validation doesn't check whether an object is valid by itself, but whether it is valid for some purpose (context). For example, we could ask if some article is ready (valid) to be published, etc.
 
-There are several well-known interfaces exist for validation like [ActiveModel::Validations][active-model-validation], or its [ActiveRecord][active-record-validation] extension in Rails, or PORO [Dry::Validation][dry-validation]. All of them focuse on providing rich DSL-s for **validation rules**.
+There are several well-known interfaces exist for validation like [ActiveModel::Validations][active-model-validation], or its [ActiveRecord][active-record-validation] extension in Rails, or PORO [Dry::Validation][dry-validation]. All of them focus on providing rich DSL-s for **validation rules**.
 
-**Tram::Policy** follows another approach -- it uses simple Ruby methods for validation, but focuses on building both *customiseable* and *composable* results of validation, namely their errors.
+**Tram::Policy** follows another approach -- it uses simple Ruby methods for validation, but focuses on building both *customizable* and *composable* results of validation, namely their errors.
 
-- By **customiseable** we mean adding any number of *tags* to validation error -- to allow filtering and sorting validation results.
-- By **composable** we mean a possibility to merge errors, provided by one policy/validator to another, for building nested sets of well-focused policies.
+- By **customizable** we mean adding any number of *tags* to validation error -- to allow filtering and sorting validation results.
+- By **composable** we mean a possibility to merge errors provided by one policy/validator to another, for building nested sets of well-focused policies.
 
-Keeping this reasons in mind, lets go to some examples.
+Keeping this reasons in mind, let's go to some examples.
 
 ## Synopsis
 
@@ -61,15 +61,15 @@ class Article::ReadinessPolicy < Tram::Policy
   end
 
   def text_presence
-    return unless title.empty?
+    return unless text.empty?
     # Adds an error with a translated message. All fields are available
     # both as error tags, and I18n translation options
-    errors.add :empty_subtitle, field: "text", level: "error"
+    errors.add :empty_text, field: "text", level: "error"
   end
 end
 ```
 
-Because a policy is responsible for validation only, we don't need to call validation explicitly. All validations are made by its initializer immediately; the results are memoized in array of its `errors`. The methods `#valid?`, `#invalid?` and `#validate!` just check those `#errors`.
+Because validation is the only responsibility of a policy, we don't need to call it explicitly. Policy initializer will perform all the checks immediately, memoizing the results into `errors` array. The methods `#valid?`, `#invalid?` and `#validate!` just check those `#errors`.
 
 You can treat an instance of policy object as immutable.
 
@@ -85,7 +85,7 @@ policy.validate!   # raises Tram::Policy::ValidationError
 
 # Look at errors closer
 policy.errors.count # => 2 (no subtitle, no text)
-policy.errors.filter { |error| error.tags[:field] == "error" }.count # => 1
+policy.errors.filter { |error| error.tags[:level] == "error" }.count # => 1
 policy.errors.filter { |error| error.level == "error" }.count # => 1
 
 # Error messages are already added under special key :message
@@ -109,10 +109,10 @@ policy.valid? { |error| error.level != "disaster" }               # => true
 policy.invalid? { |error| %w(warning error).include? error.level } # => true
 policy.invalid? { |error| error.level == "disaster" }              # => false
 
-policy.validate! { |errro| error.level != "disaster" } # => nil (seems ok)
+policy.validate! { |error| error.level != "disaster" } # => nil (seems ok)
 ```
 
-You can use reach errors in policy composition:
+You can use errors in policy composition:
 
 ```ruby
 class Article::PublicationPolicy < Tram::Policy
@@ -158,9 +158,9 @@ en:
 
 This will provide error message "Validation error: text is empty".
 
-The last thing to say is about exceptions. When you use `validate!` it raises an exception of `Tram::Policy::ValidationError` (subclass of `RuntimeError`). Its message is built from selected errors (taking into account a `validation!` filter).
+The last thing to say is about exceptions. When you use `validate!` it raises `Tram::Policy::ValidationError` (subclass of `RuntimeError`). Its message is built from selected errors (taking into account a `validation!` filter).
 
-The exception also carries back reference to the `policy` that raised it. You can use it to extract either errors, or arguments of the policy during a debagging:
+The exception also carries a backreference to the `policy` that raised it. You can use it to extract either errors, or arguments of the policy during a debugging:
 
 ```ruby
 begin
@@ -172,13 +172,14 @@ end
 
 ## Generators
 
-The gem provides simple tool for scaffolding new policy along with RSpec specification. You
+The gem provides simple tool for scaffolding new policy along with RSpec specification.
 
 ```shell
-$ tram-policy user/readiness_policy user user:name user:emain
+$ tram-policy user/readiness_policy user user:name user:email
 ```
 
-This will generate a corresponding class
+This will generate a policy class with specification compatible to both [RSpec][rspec] and [FactoryGirl][factory-girl]:
+
 
 ```ruby
 # app/policies/user/readiness_policy.rb
@@ -187,11 +188,7 @@ class User::ReadinessPolicy < Tram::Policy
   option :name,  default: -> { user.name }
   option :email, default: -> { user.email }
 end
-```
 
-and a specification, compatible to both [RSpec][rspec] and [FactoryGirl][factory-girl]:
-
-```ruby
 # spec/policies/user/readiness_policy_spec.rb
 RSpec.describe User::ReadinessPolicy do
   let(:user)   { build :user } # <- expected a factory
