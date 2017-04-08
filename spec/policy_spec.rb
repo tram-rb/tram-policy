@@ -62,7 +62,8 @@ describe Tram::Policy do
 
   context 'validate!' do
     it 'should raise exception if some error exists' do
-      expect { @policy.validate! { |error| !%w(warning error).include? error.level } }.to raise_error(Tram::Policy::ValidationError)
+      expect { @policy.validate! { |error| !%w(warning error).include? error.level } }.to raise_error(Tram::Policy::ValidationError,
+        'Subtitle is empty: {:field=>"subtitle", :level=>"warning"}. Error translation for missed text: {:field=>"text", :level=>"error"}')
     end
 
     it 'should not raise exception if no errors exist' do

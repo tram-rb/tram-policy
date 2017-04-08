@@ -49,8 +49,10 @@ module Tram
     end
 
     # Raises Tram::Policy::ValidationError exception if some error exists
+    # Its message is built from selected errors (taking into account a validation! filter)
     def validate!(&block)
-      raise Tram::Policy::ValidationError.new(self) unless valid?(&block)
+      filtered_errors = block ? @errors.reject(&block) : @errors
+      raise Tram::Policy::ValidationError.new(self, filtered_errors) unless valid?(&block)
     end
 
     # Use for RSpec matcher be_invalid_at

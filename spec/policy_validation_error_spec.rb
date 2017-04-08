@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Tram::Policy::ValidationError do
   before(:all) do
     @policy = Tram::Policy.new(Article.new)
-    @error = Tram::Policy::ValidationError.new(@policy)
+    @error = Tram::Policy::ValidationError.new(@policy, @policy.errors)
   end
 
   it { expect(described_class).to be < RuntimeError }
