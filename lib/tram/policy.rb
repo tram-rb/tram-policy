@@ -16,16 +16,20 @@ module Tram
       #
       #   validate :title_presence
       def validate(method)
-        @validators = validators.push(method)
+        init_validators
+        @validators.push(method)
       end
 
-      def validators
-        @validators || Array.new
+      def init_validators
+        @validators ||= Array.new
       end
+
+      attr_reader :validators
     end
 
     def initialize(*args, options)
       super
+      self.class.init_validators
       @errors = Tram::Policy::Errors.new(self)
       run_validations!
     end
