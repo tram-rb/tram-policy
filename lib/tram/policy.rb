@@ -41,7 +41,7 @@ module Tram
     def validate!(&block)
       return if valid?(&block)
 
-      raise ValidationError.new(messages.join('; '), self)
+      raise ValidationError.new(messages.join("; "), self)
     end
 
     private

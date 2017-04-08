@@ -6,10 +6,10 @@ end
 
 policy_name = ARGV[0]
 model_name = ARGV[1]
-attributes = (ARGV[2..-1] || []).map { |attribute| attribute.split(':') }
+attributes = (ARGV[2..-1] || []).map { |attribute| attribute.split(":") }
 
-policy_class_name = policy_name.split("/").map { |part| camelize(part) }.join("::")
-model_class_name = camelize(model_name)
+policy_class_name =
+  policy_name.split("/").map { |part| camelize(part) }.join("::")
 
 klass = <<~CLASS
   class #{policy_class_name} < Tram::Policy
@@ -41,5 +41,3 @@ spec += "end"
 puts klass
 puts
 puts spec
-
-

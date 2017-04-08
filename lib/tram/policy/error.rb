@@ -16,16 +16,16 @@ module Tram
         tags.merge(message: message)
       end
 
-      def ==(another_error)
-        return false unless another_error.kind_of? self.class
+      def ==(other)
+        return false unless other.kind_of? self.class
 
-        messages_are_equal = message == another_error.message
-        tags_are_equal = tags == another_error.tags
+        messages_are_equal = message == other.message
+        tags_are_equal = tags == other.tags
 
         messages_are_equal && tags_are_equal
       end
 
-      def respond_to?(method_name)
+      def respond_to_missing?(method_name)
         tags_include? method_name
       end
 

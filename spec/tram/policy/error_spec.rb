@@ -6,7 +6,7 @@ RSpec.describe Tram::Policy::Error do
   describe "#full_message" do
     it "should return message with tags" do
       expect(subject.full_message).to eq(
-        "Some error message" => { field: "name", level: "error" },
+        "Some error message" => { field: "name", level: "error" }
       )
     end
   end
@@ -16,13 +16,13 @@ RSpec.describe Tram::Policy::Error do
       expect(subject.to_h).to eq(
         message: "Some error message",
         field: "name",
-        level: "error",
+        level: "error"
       )
     end
   end
 
   describe "#==" do
-    context 'when two errors have equal messages and tags' do
+    context "when two errors have equal messages and tags" do
       it "should return true" do
         another_error = build(
           :error,

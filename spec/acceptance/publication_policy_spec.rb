@@ -37,13 +37,13 @@ RSpec.describe Dummy::ReadinessPolicy do
 
     it "should return array of errors messages with additional info" do
       expect(subject.full_messages).to eq([
-        { "Title is empty" => { field: 'title', level: 'error' } }
+        { "Title is empty" => { field: "title", level: "error" } }
       ])
     end
   end
 
   describe "#valid" do
-    context 'with block' do
+    context "with block" do
       before { article.text = nil }
       it "ignores errors, which yields true in block" do
         valid_without_block = subject.valid?
@@ -56,7 +56,7 @@ RSpec.describe Dummy::ReadinessPolicy do
   end
 
   describe "#invalid" do
-    context 'with block' do
+    context "with block" do
       before { article.text = nil }
       it "counts only errors, which yields true in block" do
         invalid_without_block = subject.invalid?
@@ -75,18 +75,18 @@ RSpec.describe Dummy::ReadinessPolicy do
       article.subtitle = nil
     end
 
-    context 'without block' do
-      it 'should raise error' do
+    context "without block" do
+      it "should raise error" do
         expect { subject.validate! }.to \
           raise_error(Tram::Policy::ValidationError, /Title is empty/)
       end
     end
 
-    context 'with block' do
+    context "with block" do
       it "should count only errors, that yield true in block" do
-        expect {
-          subject.validate! { |error| error.level == 'disaster' }
-        }.not_to raise_error
+        expect do
+          subject.validate! { |error| error.level == "disaster" }
+        end.not_to raise_error
       end
     end
 
@@ -99,9 +99,9 @@ RSpec.describe Dummy::ReadinessPolicy do
     end
 
     it "should raise exception, which message is built from errors" do
-      expect {
+      expect do
         subject.validate!
-      }.to raise_error(
+      end.to raise_error(
         Tram::Policy::ValidationError,
         "Title is empty; Subtitle is empty"
       )
@@ -115,6 +115,6 @@ RSpec.describe Dummy::ReadinessPolicy do
 
   context "with wrong text" do
     before { article.text = nil }
-    it { is_expected.to be_invalid_at field: "text", level: "error" }
+    it { is_expected.to be_invalid_at field: "text" }
   end
 end

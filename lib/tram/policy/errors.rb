@@ -9,9 +9,8 @@ module Tram
       end
 
       def add(message, tags)
-        if message.is_a? Symbol
-          message = translate_message(message, tags)
-        end
+        message = translate_message(message, tags) if message.is_a? Symbol
+
         error = Error.new(message, tags)
         @errors_list << error
       end
