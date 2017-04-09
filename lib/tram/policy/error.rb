@@ -12,6 +12,7 @@ module Tram
         @message.to_s
       end
 
+      # Returns original message, skipping translation
       def raw_message
         @message.content
       end
