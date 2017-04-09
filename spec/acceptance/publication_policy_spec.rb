@@ -7,28 +7,11 @@ RSpec.describe Dummy::ReadinessPolicy do
 
   it { is_expected.to be_valid }
 
-  describe "#errors" do
-    before { article.title = nil }
-
-    it "should return the Enumerable" do
-      expect(subject.errors).to be_kind_of Enumerable
-      expect(subject.errors).to respond_to :each
-    end
-  end
-
   describe "#messages" do
     before { article.title = nil }
 
     it "should return array of errors messages" do
       expect(subject.messages).to match_array(["Title is empty"])
-    end
-  end
-
-  describe "I18n" do
-    before { article.text = nil }
-    it "should translate message symbol" do
-      expect(subject.messages).to \
-        match_array(["Validation error: text is empty"])
     end
   end
 
@@ -42,30 +25,34 @@ RSpec.describe Dummy::ReadinessPolicy do
     end
   end
 
-  describe "#valid" do
-    context "with block" do
-      before { article.text = nil }
-      it "ignores errors, which yields true in block" do
-        valid_without_block = subject.valid?
-        valid_with_block = subject.valid? { |error| error.level == :warning }
-
-        expect(valid_without_block).to be false
-        expect(valid_with_block).to be true
-      end
+  describe "I18n" do
+    before { article.text = nil }
+    it "should translate message symbol" do
+      expect(subject.messages).to \
+        match_array(["Validation error: text is empty"])
     end
   end
 
-  describe "#invalid" do
-    context "with block" do
-      before { article.text = nil }
-      it "counts only errors, which yields true in block" do
-        invalid_without_block = subject.invalid?
-        invalid_with_block =
-          subject.invalid? { |error| error.level == :disaster }
+  describe "#valid?" do
+    before { article.text = nil }
+    it "ignores errors, which yields true in block" do
+      valid_without_block = subject.valid?
+      valid_with_block = subject.valid? { |error| error.level == :warning }
 
-        expect(invalid_without_block).to be true
-        expect(invalid_with_block).to be false
-      end
+      expect(valid_without_block).to be false
+      expect(valid_with_block).to be true
+    end
+  end
+
+  describe "#invalid?" do
+    before { article.text = nil }
+    it "counts only errors, which yields true in block" do
+      invalid_without_block = subject.invalid?
+      invalid_with_block =
+        subject.invalid? { |error| error.level == :disaster }
+
+      expect(invalid_without_block).to be true
+      expect(invalid_with_block).to be false
     end
   end
 
@@ -106,15 +93,5 @@ RSpec.describe Dummy::ReadinessPolicy do
         "Title is empty; Subtitle is empty"
       )
     end
-  end
-
-  context "with wrong title" do
-    before { article.title = nil }
-    it { is_expected.to be_invalid_at field: "title" }
-  end
-
-  context "with wrong text" do
-    before { article.text = nil }
-    it { is_expected.to be_invalid_at field: "text" }
   end
 end
