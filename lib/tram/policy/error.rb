@@ -35,18 +35,12 @@ module Tram
       end
 
       def respond_to_missing?(method_name)
-        tags_include? method_name
+        tags.key?(method_name)
       end
 
       def method_missing(method_name)
-        return tags[method_name] if tags_include? method_name
+        return tags[method_name] if tags.key?(method_name)
         super
-      end
-
-      private
-
-      def tags_include?(tag)
-        tags.keys.include? tag
       end
     end
   end
