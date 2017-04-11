@@ -5,12 +5,25 @@ module Tram
   class Policy
     extend Dry::Initializer
 
+    @validators = []
+
     class << self
       alias [] new
       attr_reader :validators
 
-      def validate(method_name)
+      def inherit_validators(validators)
         @validators ||= []
+        @validators.concat(validators)
+      end
+
+      def inherited(sublass)
+        sublass.inherit_validators(@validators)
+        super
+      end
+
+      private
+
+      def validate(method_name)
         @validators << method_name
       end
     end
