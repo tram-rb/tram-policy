@@ -46,6 +46,10 @@ RSpec.describe Tram::Policy::Generators::PolicyGenerator do
 
       it { is_expected.to exist }
       it { is_expected.to contain("RSpec.describe User::ReadinessPolicy") }
+      it { is_expected.to contain("let(:user) { build(:user) }") }
+      it { is_expected.to contain("let(:policy) { described_class[user] }") }
+      it { is_expected.to contain(/be_invalid_at field: "name"/) }
+      it { is_expected.to contain(/be_invalid_at field: "email"/) }
     end
   end
 
@@ -69,10 +73,7 @@ RSpec.describe Tram::Policy::Generators::PolicyGenerator do
       end
       it { is_expected.to contain("param :user") }
       it do
-        is_expected.not_to contain("option :name, default: -> { user.name }")
-      end
-      it do
-        is_expected.not_to contain("option :email, default: -> { user.email }")
+        is_expected.not_to contain(/option/)
       end
     end
 
@@ -81,6 +82,9 @@ RSpec.describe Tram::Policy::Generators::PolicyGenerator do
 
       it { is_expected.to exist }
       it { is_expected.to contain("RSpec.describe User::ReadinessPolicy") }
+      it { is_expected.to contain("let(:user) { build(:user) }") }
+      it { is_expected.to contain("let(:policy) { described_class[user] }") }
+      it { is_expected.not_to contain(/context/) }
     end
   end
 end
