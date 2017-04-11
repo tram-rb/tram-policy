@@ -8,10 +8,10 @@ module Tram
       desc "Generates new policy class with specs"
       argument :policy_name, type: :string, desc: "module/class"
       argument :model, type: :string, desc: "model"
-      class_option :attributes,
-                   type: :array,
-                   optional: true,
-                   desc: "model: field_name"
+      argument :attributes,
+               type: :array,
+               optional: true,
+               desc: "model: field_name"
 
       def self.source_root
         File.dirname(__FILE__)
@@ -38,9 +38,9 @@ module Tram
         end
 
         def parsed_attributes
-          return [] unless options[:attributes]
+          return [] unless attributes
 
-          options[:attributes].map do |attr|
+          attributes.map do |attr|
             model, name = attr.split(":")
             { model: model, name: name }
           end

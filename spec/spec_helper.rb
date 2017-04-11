@@ -2,6 +2,8 @@ require "bundler/setup"
 require "tram-policy"
 require "factory_girl"
 
+Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each { |file| require file }
+
 I18n.load_path = [File.dirname(__FILE__) + "/locales/en.yml"]
 I18n.locale = :en
 
