@@ -5,13 +5,20 @@ module Tram
     class PolicyGenerator < Thor::Group
       include Thor::Actions
 
-      desc "Generates new policy class with specs"
-      argument :policy_name, type: :string, desc: "module/class"
-      argument :model, type: :string, desc: "model"
+      desc "Generates new policy class and the spec for it " \
+            "and places it in the `app/policies` and `spec/policies` " \
+            "correspondingly"
+
+      argument :policy_name,
+               type: :string,
+               desc: "policy class name in snake case, " \
+                      "modules separated with slashes"
+      argument :model, type: :string, desc: "model under the policy"
       argument :attributes,
                type: :array,
                optional: true,
-               desc: "model: field_name"
+               desc: "list of model attributes, that will be injected into" \
+                      "policy. Format: `model_name:attr1 model_name:attr2..."
 
       def self.source_root
         File.dirname(__FILE__)
