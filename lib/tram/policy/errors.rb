@@ -5,14 +5,14 @@ module Tram
 
       def initialize(policy_class)
         @errors_list = []
-        @policy_class = policy_class
+        @policy_i18n_scope = policy_class.name.underscore.gsub("::", "/")
       end
 
       def add(message, tags)
         unless message.is_a? Error::Message
           message = Error::Message.new(
             message,
-            translation_scope: policy_i18n_scope,
+            translation_scope: @policy_i18n_scope,
             variables: tags
           )
         end
@@ -23,12 +23,6 @@ module Tram
 
       def each(&block)
         @errors_list.each(&block)
-      end
-
-      private
-
-      def policy_i18n_scope
-        @policy_class.name.underscore.gsub("::", "/")
       end
     end
   end

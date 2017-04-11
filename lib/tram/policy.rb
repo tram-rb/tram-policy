@@ -8,6 +8,11 @@ module Tram
     class << self
       alias [] new
       attr_reader :validators
+
+      def validate(method_name)
+        @validators ||= []
+        @validators << method_name
+      end
     end
 
     def errors
@@ -42,13 +47,6 @@ module Tram
       return if valid?(&block)
 
       raise ValidationError.new(messages.join("; "), self)
-    end
-
-    private
-
-    def self.validate(method_name)
-      @validators ||= []
-      @validators << method_name
     end
   end
 end
