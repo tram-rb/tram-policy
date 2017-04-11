@@ -1,6 +1,6 @@
-require "generators/tram/policy_generator"
+require "generators/tram/policy/policy_generator"
 
-RSpec.describe Tram::Generators::PolicyGenerator do
+RSpec.describe Tram::Policy::Generators::PolicyGenerator do
   def destination
     File.expand_path("../../../../tmp", __FILE__)
   end
