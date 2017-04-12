@@ -28,12 +28,10 @@ module Tram
       # and you wanted the translation for the :blank error message for
       # the title attribute, it looks for this translation: article/readiness_policy.empty
       def generate_message(message)
-        if message.is_a?(String)
-          message
-        elsif message.is_a?(Symbol)
+        if message.is_a?(Symbol)
           I18n.t(message, @tags.merge(scope: i18n_scope, default: "Error translation for missed text"))
         else
-          raise ArgumentError.new("Only strings or symbols are allowed")
+          message.to_s
         end
       end
 
