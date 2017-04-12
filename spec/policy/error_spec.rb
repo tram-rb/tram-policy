@@ -63,7 +63,7 @@ describe Tram::Policy::Error do
   context 'undefined methods treated as tags' do
     it { expect(error.field).to eq('title') }
     it { expect(error.level).to eq('error') }
-    it { expect { error.time }.to raise_error(NoMethodError) }
+    it { expect(error.time).to be_nil }
   end
 
   context '.missed_translations' do

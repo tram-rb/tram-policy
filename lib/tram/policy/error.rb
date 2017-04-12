@@ -63,11 +63,7 @@ module Tram
 
       # Undefined methods treated as tags
       def method_missing(m, *args, &block)
-        if tags.has_key?(m.to_sym)
-          tags[m.to_sym]
-        else
-          super
-        end
+        tags[m.to_sym]
       end
 
       private
