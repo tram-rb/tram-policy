@@ -6,12 +6,11 @@ module Tram
       include Enumerable
       extend Forwardable
 
-      def_delegators :@errors, :each, :size, :empty?
-      attr_reader :errors
+      def_delegators :@set, :each, :size, :empty?
 
       def initialize(policy)
         @policy = policy
-        @errors = []
+        @set = []
       end
 
       # Adds an error to the collection
@@ -19,23 +18,23 @@ module Tram
       #
       #   errors.add "Title is empty", field: "title", level: "error"
       def add(message, tags = {})
-        @errors.push Tram::Policy::Error.new(@policy, message, tags)
+        @set.push Tram::Policy::Error.new(@policy, message, tags)
       end
 
       # Clear collection of errors
       # Return empty array
       def clear
-        @errors = []
+        @set = []
       end
 
       # Return an array of messages
       def messages
-        @errors.map(&:message)
+        @set.map(&:message)
       end
 
       # Return an array of messages with tags info added
       def full_messages
-        @errors.map(&:full_message)
+        @set.map(&:full_message)
       end
 
       alias filter select
