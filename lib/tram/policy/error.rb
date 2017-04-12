@@ -56,10 +56,9 @@ module Tram
         tags.merge(message: message)
       end
 
-      # Checks whether an error is equal to another one
-      # Errors are equal if policies, tags and messages are equal
-      def ==(error)
-        policy == error.policy && to_h == error.to_h
+      # Checks whether an error is equal to another object
+      def ==(other)
+        to_h == other.to_h
       end
 
       # Undefined methods treated as tags
