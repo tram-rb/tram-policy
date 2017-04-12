@@ -1,6 +1,0 @@
-class <%= policy_class_name %> < Tram::Policy
-  param :<%= model %>
-<%- parsed_attributes.each do |attribute| -%>
-  option :<%= attribute[:name] %>, default: -> { <%= attribute[:model] %>.<%= attribute[:name] %> }
-<%- end -%>
-end

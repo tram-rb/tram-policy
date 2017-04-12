@@ -10,19 +10,16 @@ Gem::Specification.new do |gem|
   gem.files            = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   gem.test_files       = gem.files.grep(/^spec/)
   gem.extra_rdoc_files = Dir["README.md", "LICENSE", "CHANGELOG.md"]
-  gem.executables << "tram-policy"
-
-  gem.executables = ['tram-policy']
+  gem.executables      = %w[tram-policy]
 
   gem.required_ruby_version = ">= 2.2"
 
-  gem.add_runtime_dependency "dry-initializer", "~> 1.3"
+  gem.add_runtime_dependency "dry-initializer", "~> 1.4"
   gem.add_runtime_dependency "i18n", "~> 0.8"
-  gem.add_runtime_dependency "thor", "~> 0.19"
-  gem.add_runtime_dependency "activesupport", "~> 4.2"
 
+  gem.add_development_dependency "rake", "> 10"
   gem.add_development_dependency "rspec", "~> 3.0"
-  gem.add_development_dependency "rake", "~>10", "> 10"
+  gem.add_development_dependency "rspec-its", "~> 1.2"
   gem.add_development_dependency "rubocop", "~> 0.42"
-  gem.add_development_dependency "factory_girl", "~> 4.8"
+  gem.add_development_dependency "thor", "~> 0.19"
 end

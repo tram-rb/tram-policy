@@ -1,4 +1,0 @@
----
-en:
-  dummy/readiness_policy:
-    empty_text: "Validation %{level}: %{field} is empty"
