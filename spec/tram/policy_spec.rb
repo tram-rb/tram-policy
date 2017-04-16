@@ -1,11 +1,11 @@
 RSpec.describe Tram::Policy do
   before do
-    I18n.available_locales = %w(en)
+    I18n.available_locales = %w[en]
 
     class Test::UserPolicy < Tram::Policy
       param :user
 
-      validate :name, "email", %w(email name)
+      validate :name, "email", %w[email name]
 
       private
 

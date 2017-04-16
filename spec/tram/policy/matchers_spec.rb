@@ -2,7 +2,7 @@ RSpec.describe "RSpec matchers:" do
   subject { Test::UserPolicy[name: nil] }
 
   before do
-    I18n.available_locales = %i(en)
+    I18n.available_locales = %i[en]
     I18n.backend.store_translations \
       :en, { "test/user_policy" => { "name_presence" => "Name is absent" } }
 
@@ -40,7 +40,7 @@ RSpec.describe "RSpec matchers:" do
     end
 
     it "fails when some translations are absent" do
-      I18n.available_locales = %i(ru en)
+      I18n.available_locales = %i[ru en]
 
       expect do
         expect { subject }.to be_invalid_at field: "name"

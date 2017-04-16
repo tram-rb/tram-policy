@@ -68,7 +68,7 @@ RSpec.describe Tram::Policy::Errors do
 
     context "with errors added:" do
       before  { errors.add "OMG!", level: "info", field: "name" }
-      it { is_expected.to eq %w(OMG!) }
+      it { is_expected.to eq %w[OMG!] }
     end
   end
 
