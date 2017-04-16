@@ -10,7 +10,7 @@ RSpec.describe Tram::Policy do
       private
 
       def name
-        user.name
+        errors.add "No name", level: "warning" unless user.name
       end
 
       def email
@@ -29,7 +29,8 @@ RSpec.describe Tram::Policy do
   end
 
   let(:policy) { Test::UserPolicy[user] }
-  let(:user)   { double :user, name: nil, email: nil, login: nil }
+  let(:user)   { double :user, name: name, email: nil, login: nil }
+  let(:name)   { nil }
 
   describe "Dry::Initializer interface" do
     it "is accessible" do
@@ -57,6 +58,92 @@ RSpec.describe Tram::Policy do
   describe "#inspect" do
     subject { policy.inspect }
     it { is_expected.to eq "#<Test::UserPolicy[{:user=>#<Double :user>}]>" }
+  end
+
+  describe "#errors" do
+    subject { policy.errors }
+
+    its(:class)  { is_expected.to eq Tram::Policy::Errors }
+    its(:policy) { is_expected.to eql policy }
+  end
+
+  describe "#valid?" do
+    context "when #errors are present" do
+      subject { policy.valid? }
+      let(:name) { nil }
+
+      it { is_expected.to eq false }
+    end
+
+    context "with a filter" do
+      subject { policy.valid? { |err| err.level != "error" } }
+      let(:name) { nil }
+
+      it "takes into account filtered errors" do
+        expect(subject).to eq true
+      end
+    end
+
+    context "when #errors are absent" do
+      subject { policy.valid? }
+      let(:name) { :foo }
+
+      it { is_expected.to eq true }
+    end
+  end
+
+  describe "#invalid?" do
+    context "when #errors are present" do
+      subject { policy.invalid? }
+      let(:name) { nil }
+
+      it { is_expected.to eq true }
+    end
+
+    context "with a filter" do
+      subject { policy.invalid? { |err| err.level == "error" } }
+      let(:name) { nil }
+
+      it "filters errors out" do
+        expect(subject).to eq false
+      end
+    end
+
+    context "when #errors are absent" do
+      subject { policy.invalid? }
+      let(:name) { :foo }
+
+      it { is_expected.to eq false }
+    end
+  end
+
+  describe "#validate!" do
+    context "when #errors are present" do
+      subject { policy.validate! }
+      let(:name) { nil }
+
+      it "raises an exception" do
+        expect { subject }.to raise_error Tram::Policy::ValidationError
+      end
+    end
+
+    context "with a filter" do
+      subject { policy.validate! { |err| err.level != "error" } }
+      let(:name) { nil }
+
+      it "takes into account filtered errors" do
+        expect { subject }.not_to raise_error
+      end
+    end
+
+    context "when #errors are absent" do
+      subject { policy.validate! }
+      let(:name) { :foo }
+
+      it "doesn't raise an exception" do
+        expect { subject }.not_to raise_error
+      end
+    end
   end
 
   describe "#t" do

@@ -54,6 +54,42 @@ module Tram
       I18n.t message, options.merge(scope: @__scope__)
     end
 
+    # Collection of validation errors
+    #
+    # @return [Tram::Policy::Errors]
+    #
+    def errors
+      @errors ||= Errors.new(self)
+    end
+
+    # Checks whether the policy is valid
+    #
+    # @param  [Proc, nil] filter Block describing **errors to be skipped**
+    # @return [Boolean]
+    #
+    def valid?(&filter)
+      filter ? errors.reject(&filter).empty? : errors.empty?
+    end
+
+    # Checks whether the policy is invalid
+    #
+    # @param  [Proc, nil] filter Block describing **the only errors to count**
+    # @return [Boolean]
+    #
+    def invalid?(&filter)
+      filter ? errors.any?(&filter) : errors.any?
+    end
+
+    # Raises exception if the policy is not valid
+    #
+    # @param  (see #valid?)
+    # @raise  [Tram::Policy::ValidationError] if the policy isn't valid
+    # @return [nil] if the policy is valid
+    #
+    def validate!(&filter)
+      raise ValidationError.new(self, filter) unless valid?(&filter)
+    end
+
     # Human-readable representation of the policy
     #
     # @example Displays policy name and its attributes
