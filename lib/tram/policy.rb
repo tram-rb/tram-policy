@@ -5,5 +5,6 @@ module Tram
   # Base class for policy objects with composable validation errors
   class Policy
     require_relative "policy/inflector"
+    require_relative "policy/error"
   end
 end
