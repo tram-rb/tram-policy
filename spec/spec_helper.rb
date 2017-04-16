@@ -1,6 +1,11 @@
-require "pry" rescue nil
+begin
+  require "pry"
+rescue
+  nil
+end
 require "bundler/setup"
 require "tram/policy"
+require "tram/policy/matchers"
 require "rspec/its"
 
 RSpec.configure do |config|
