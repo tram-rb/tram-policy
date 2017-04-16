@@ -12,6 +12,16 @@ module Tram
     extend Dry::Initializer
 
     class << self
+      # Registers a validator
+      #
+      # @param  [#to_sym, Array<#to_sym>] names
+      # @return [self]
+      #
+      def validate(*names)
+        @validators = validators | names.flatten.map(&:to_sym)
+        self
+      end
+
       # Policy constructor/validator (alias for [.new])
       #
       # @param  [Object] *args
@@ -19,6 +29,17 @@ module Tram
       #
       def [](*args)
         new(*args)
+      end
+
+      private
+
+      def validators
+        @validators ||= []
+      end
+
+      def inherited(klass)
+        super
+        klass.validate validators
       end
     end
 
@@ -32,6 +53,13 @@ module Tram
     #
     def inspect
       "#<#{self.class.name}[#{@__options__}]>"
+    end
+
+    private
+
+    def initialize(*)
+      super
+      self.class.send(:validators).each { |name| send(name) }
     end
   end
 end
