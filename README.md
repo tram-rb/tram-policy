@@ -112,7 +112,7 @@ policy.invalid? { |error| error.level == "disaster" }              # => false
 policy.validate! { |error| error.level != "disaster" } # => nil (seems ok)
 ```
 
-You can use errors in policy composition:
+You can use errors in composition of policies:
 
 ```ruby
 class Article::PublicationPolicy < Tram::Policy
@@ -125,13 +125,13 @@ class Article::PublicationPolicy < Tram::Policy
   private
 
   def article_readiness
-    # Collects errors except warnings from "nested" policy
-    Article::ReadinessPolicy[article].errors.each do |err|
-      next if err.level == "warning"
-      # If symbolic key was provided as message, `#raw_message` returns it, skipping I18n translation.
-      # Otherwise `#raw_message` is equivalent to `#message`
-      errors.add err.raw_message, err.tags.merge { field: "article[#{err.field}]" }
-    end
+    # Collects errors tagged by level: "error" from "nested" policy
+    others = Article::ReadinessPolicy[article].errors.by_tags(level: "error")
+
+    # Merges collected errors to the current ones.
+    # New errors are tagged by source: "readiness".
+    # Notice the block takes _hashified_ errors.
+    errors.merge(others) { |hash| hash[:source] = "readiness" }
   end
 
   def article_selection
@@ -172,12 +172,59 @@ rescue Tram::Policy::ValidationError => error
 end
 ```
 
+## RSpec matchers
+
+RSpec matchers defined in a file `tram-policy/matcher` (not loaded in runtime).
+
+Use `be_invalid_at` matcher to check whether a policy has errors with given tags.
+
+```ruby
+# app/policies/user/readiness_policy.rb
+class User::ReadinessPolicy < Tram::Policy
+  option :name,  proc(&:to_s), optional: true
+  option :email, proc(&:to_s), optional: true
+
+  validate :name_presence
+
+  private
+
+  def name_presence
+    return unless name.empty?
+    errors.add "Name is absent", level: "error"
+  end
+end
+```
+
+```ruby
+# spec/spec_helper.rb
+require "tram-policy/matcher"
+```
+
+```ruby
+# spec/policies/user/readiness_policy_spec.rb
+RSpec.describe User::ReadinessPolicy do
+  let(:user) { build :user } # <- expected a factory
+
+  subject(:policy) { described_class[email: "user@example.com"] }
+
+  it "is invalid with 'error' level" do
+    expect { policy }.to be_invalid_at level: "error"
+  end
+
+  it "is not invalid with 'info' level" do
+    expect { policy }.not_to be_invalid_at level: "info"
+  end
+end
+```
+
+**Notice** that you have to wrap policy into block `{ policy }`. This is because matcher checks not only presence of an error, but also ensures its message is translated to all available locales (`I18n.available_locales`). The block containing a policy will be executed separately for every such language.
+
 ## Generators
 
-The gem provides simple tool for scaffolding new policy along with RSpec specification.
+The gem provides simple tool for scaffolding new policy along with RSpec test template.
 
 ```shell
-$ tram-policy user/readiness_policy user user:name user:email
+$ tram-policy user/readiness_policy -p user -o admin -v name_present email_present
 ```
 
 This will generate a policy class with specification compatible to both [RSpec][rspec] and [FactoryGirl][factory-girl]:
@@ -187,25 +234,51 @@ This will generate a policy class with specification compatible to both [RSpec][
 # app/policies/user/readiness_policy.rb
 class User::ReadinessPolicy < Tram::Policy
   param  :user
-  option :name,  default: -> { user.name }
-  option :email, default: -> { user.email }
-end
+  option :admin
 
+  validate :name_present
+  validate :email_present
+
+  private
+
+  def name_present
+    return if true # modify condition
+    errors.add :name_present # add necessary tags
+  end
+
+  def email_present
+    return if true # modify condition
+    errors.add :email_present # add necessary tags
+  end
+end
+```
+
+```yaml
+# config/tram-policies.en.yml
+---
+en:
+  user/readiness_policy:
+    name_present:  name_present
+    email_present: email_present
+```
+
+```ruby
 # spec/policies/user/readiness_policy_spec.rb
 RSpec.describe User::ReadinessPolicy do
-  let(:user)   { build :user } # <- expected a factory
+  let(:user) { build :user } # <- expected a factory
+
   subject(:policy) { described_class[user] }
 
   it { is_expected.to be_valid }
 
-  context "with wrong name" do
-    before { user.name = nil }
-    it { is_expected.to be_invalid_at field: "name" }
+  it "is invalid when not name_present" do
+    policy # modify it correspondingly
+    expect { policy }.to be_invalid_at # add tags to check
   end
 
-  context "with wrong name" do
-    before { user.email = nil }
-    it { is_expected.to be_invalid_at field: "email" }
+  it "is invalid when not email_present" do
+    policy # modify it correspondingly
+    expect { policy }.to be_invalid_at # add tags to check
   end
 end
 ```
@@ -232,13 +305,16 @@ The `Tram::Policy` DSL provides the following methods:
 * `#valid?` - checks whether no errors exist
 * `#invalid?` - checks whether some error exists
 * `#validate!` - raises if some error exist
-* `messages` - returns an array of messages
-* `full_messages` - returns an array of messages with tags info added (used in exception)
 
 Enumerable collection of unique policy `errors` (`Tram::Policy::Errors`) responds to methods:
 
 * `add` - adds an error to the collection
 * `each` - iterates by the set of errors (support other methods of enumerables)
+* `empty?` - checks whether a collection is emtpy (in addition to enumerable interface)
+* `by_tags` - filters errors that have given tags
+* `messages` - returns an array of messages
+* `full_messages` - returns an array of messages with tags info added (used in exception)
+* `merge` - merges a collection to another one
 
 Every instance of `Tram::Policy::Error` supports:
 

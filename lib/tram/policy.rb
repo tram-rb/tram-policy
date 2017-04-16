@@ -6,5 +6,6 @@ module Tram
   class Policy
     require_relative "policy/inflector"
     require_relative "policy/error"
+    require_relative "policy/errors"
   end
 end
