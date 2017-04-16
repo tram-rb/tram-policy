@@ -43,6 +43,17 @@ module Tram
       end
     end
 
+    # Translates a message in the scope of current policy
+    #
+    # @param  [#to_s] message
+    # @param  [Hash<Symbol, Object>] options
+    # @return [String]
+    #
+    def t(message, **options)
+      return message.to_s unless message.is_a? Symbol
+      I18n.t message, options.merge(scope: @__scope__)
+    end
+
     # Human-readable representation of the policy
     #
     # @example Displays policy name and its attributes
@@ -59,6 +70,7 @@ module Tram
 
     def initialize(*)
       super
+      @__scope__ = Inflector.underscore(self.class.name)
       self.class.send(:validators).each { |name| send(name) }
     end
   end

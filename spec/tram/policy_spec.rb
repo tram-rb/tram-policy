@@ -1,5 +1,7 @@
 RSpec.describe Tram::Policy do
   before do
+    I18n.available_locales = %w(en)
+
     class Test::UserPolicy < Tram::Policy
       param :user
 
@@ -55,5 +57,30 @@ RSpec.describe Tram::Policy do
   describe "#inspect" do
     subject { policy.inspect }
     it { is_expected.to eq "#<Test::UserPolicy[{:user=>#<Double :user>}]>" }
+  end
+
+  describe "#t" do
+    subject { policy.t(value, level: "error") }
+
+    before do
+      I18n.backend.store_translations :en, {
+        "test/user_policy" => { "name_presence" => "%{level}: Name is absent" }
+      }
+    end
+
+    context "string" do
+      let(:value) { "Name should be present" }
+      it { is_expected.to eq value }
+    end
+
+    context "non-symbol" do
+      let(:value) { 42 }
+      it { is_expected.to eq "42" }
+    end
+
+    context "symbol" do
+      let(:value) { :name_presence }
+      it { is_expected.to eq "error: Name is absent" }
+    end
   end
 end
