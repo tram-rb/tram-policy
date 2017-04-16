@@ -1,0 +1,17 @@
+require "spec_helper"
+
+RSpec.describe <%= klass %>, "#valid?" do
+  subject(:policy) { described_class[<%= policy_signature.join(", ") %>] }
+
+<% (parsed_params + parsed_options).each do |name| -%>
+  let(:<%= name %>) { FactoryGirl.build :<%= name %> }
+<% end -%>
+
+  it { is_expected.to be_valid }
+<% parsed_validators.each do |validator| %>
+  it "is invalid when not <%= validator %>" do
+    policy # modify it correspondingly
+    expect { policy }.to be_invalid_at # add tags to check
+  end
+<% end -%>
+end
