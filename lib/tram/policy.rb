@@ -1,5 +1,6 @@
 require "dry-initializer"
-require "i18n"
+require "tram/policy/errors"
+require "tram/policy/validation_error"
 
 module Tram
   class Policy

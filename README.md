@@ -194,7 +194,7 @@ end
 # spec/policies/user/readiness_policy_spec.rb
 RSpec.describe User::ReadinessPolicy do
   let(:user)   { build :user } # <- expected a factory
-  let(:policy) { described_class[user] }
+  subject(:policy) { described_class[user] }
 
   it { is_expected.to be_valid }
 
