@@ -2,7 +2,7 @@ class Tram::Policy
   # Validation error with message and assigned tags
   #
   # Notice: an error is context-independent; it knows nothing about
-  #         a collection it is placed to; it can be safely replaced
+  #         a collection it is placed to; it can be safely moved
   #         from one collection of [Tram::Policy::Errors] to another.
   #
   class Error
