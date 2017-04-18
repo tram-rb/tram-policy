@@ -125,7 +125,7 @@ class Article::PublicationPolicy < Tram::Policy
   private
 
   def article_readiness
-    # Collects errors except warnings from "nested" policy 
+    # Collects errors except warnings from "nested" policy
     Article::ReadinessPolicy[article].errors.each do |err|
       next if err.level == "warning"
       errors.add err.to_h.merge { field: "article[#{err.field}]" }
@@ -192,7 +192,7 @@ end
 # spec/policies/user/readiness_policy_spec.rb
 RSpec.describe User::ReadinessPolicy do
   let(:user)   { build :user } # <- expected a factory
-  let(:policy) { described_class[user] }
+  subject(:policy) { described_class[user] }
 
   it { is_expected.to be_valid }
 
