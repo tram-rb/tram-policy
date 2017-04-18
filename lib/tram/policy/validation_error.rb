@@ -1,8 +1,12 @@
-class Tram::Policy::ValidationError < RuntimeError
-  attr_reader :policy
+module Tram
+  class Policy
+    class ValidationError < RuntimeError
+      attr_reader :policy
 
-  def initialize(policy, errors)
-    @policy = policy
-    super(errors.map(&:full_message).join('. '))
+      def initialize(message, policy)
+        @policy = policy
+        super(message)
+      end
+    end
   end
 end

@@ -1,43 +1,29 @@
-require "tram/policy/error"
-
 module Tram
   class Policy
     class Errors
       include Enumerable
-      extend Forwardable
 
-      def_delegators :@set, :each, :size, :empty?
-
-      def initialize(policy)
-        @policy = policy
-        @set = []
+      def initialize(policy_class)
+        @errors_list = []
+        @policy_i18n_scope = policy_class.name.underscore.gsub("::", "/")
       end
 
-      # Adds an error to the collection
-      # Return collection of errors
-      #
-      #   errors.add "Title is empty", field: "title", level: "error"
-      def add(message, tags = {})
-        @set.push Tram::Policy::Error.new(@policy, message, tags)
+      def add(message, tags)
+        unless message.is_a? Error::Message
+          message = Error::Message.new(
+            message,
+            translation_scope: @policy_i18n_scope,
+            variables: tags
+          )
+        end
+
+        error = Error.new(message, tags)
+        @errors_list << error
       end
 
-      # Clear collection of errors
-      # Return empty array
-      def clear
-        @set = []
+      def each(&block)
+        @errors_list.each(&block)
       end
-
-      # Return an array of messages
-      def messages
-        @set.map(&:message)
-      end
-
-      # Return an array of messages with tags info added
-      def full_messages
-        @set.map(&:full_message)
-      end
-
-      alias filter select
     end
   end
 end
