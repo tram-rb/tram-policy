@@ -65,13 +65,17 @@ module Tram
         end
 
         def parsed_validators
-          @parsed_validators ||= options[:validators].map(&:downcase)
+          @parsed_validators ||= options[:validators].map do |str|
+            name, key = str.downcase.split(":")
+            { name: name, key: key || name }
+          end
         end
 
         def policy_signature
-          @policy_signature ||= \
+          @policy_signature ||= (
             parsed_params + \
             parsed_options.map { |option| "#{option}: #{option}" }
+          ).join(", ")
         end
 
         def available_locales
@@ -90,8 +94,8 @@ module Tram
           @locale_group ||= "  #{file}:\n"
         end
 
-        def locale_line(validator)
-          "    #{validator}: #{validator}\n"
+        def locale_line(key)
+          "    #{key}: translation missing\n"
         end
 
         def add_locale
@@ -102,8 +106,8 @@ module Tram
           append_to_file(locale_file, locale_group)
         end
 
-        def localize_validator(name)
-          insert_into_file locale_file, locale_line(name), after: locale_group
+        def localize_validator(key:, **)
+          insert_into_file locale_file, locale_line(key), after: locale_group
         end
       end
     end

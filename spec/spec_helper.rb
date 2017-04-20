@@ -5,7 +5,7 @@ rescue
 end
 require "bundler/setup"
 require "tram/policy"
-require "tram/policy/matchers"
+require "tram/policy/rspec"
 require "rspec/its"
 
 RSpec.configure do |config|

@@ -36,9 +36,13 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
 
   # Runs block in every available locale
   def in_available_locales
-    Array(I18n.available_locales).flat_map do |locale|
-      I18n.with_locale(locale) { yield }
-    end
+    locales = if respond_to?(:available_locales)
+                available_locales
+              else
+                I18n.available_locales
+              end
+
+    locales.flat_map { |locale| I18n.with_locale(locale) { yield } }
   end
 
   # Collects results for the current locale
@@ -67,7 +71,7 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
   # Checks if all collected errors are translated
   def translated?
     texts = errors.values.flatten.map(&:message)
-    texts.select { |text| text.start_with?("translation missing:") }.empty?
+    texts.select { |text| text.start_with?("translation missing") }.empty?
   end
 
   def report_errors
@@ -89,7 +93,8 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
   end
 
   failure_message do |_|
-    text =  "#{policy} should have had errors with tags: #{tags}, "
+    text =  "The policy: #{policy}\n"
+    text << "should have had errors with tags: #{tags}, "
     text << "whose messages are translated in all available locales.\n"
     text << report_errors
     text
@@ -105,8 +110,22 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
   end
 
   failure_message_when_negated do |_|
-    text =  "#{policy} should not have had any error with tags: #{tags}.\n"
+    text =  "#{policy}\nshould not have had any error with tags: #{tags}.\n"
     text << report_errors
     text
+  end
+end
+
+RSpec.shared_examples :invalid_policy do |condition = nil, **tags|
+  constraint = "with tags: #{tags}" if tags.any?
+  it ["is invalid", condition, constraint].compact.join(" ") do
+    expect { subject }.to be_invalid_at(tags)
+  end
+end
+
+RSpec.shared_examples :valid_policy do |condition = nil, **tags|
+  constraint = "with tags: #{tags}" if tags.any?
+  it ["is valid", condition, constraint].compact.join(" ") do
+    expect { subject }.not_to be_invalid_at(tags)
   end
 end

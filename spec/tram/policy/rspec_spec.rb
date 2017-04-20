@@ -1,4 +1,4 @@
-RSpec.describe "RSpec matchers:" do
+RSpec.describe "RSpec support:" do
   subject { Test::UserPolicy[name: nil] }
 
   before do
@@ -66,5 +66,13 @@ RSpec.describe "RSpec matchers:" do
         expect { subject }.not_to be_invalid_at
       end.to raise_error RSpec::Expectations::ExpectationNotMetError
     end
+  end
+
+  describe "shared examples" do
+    it_behaves_like :invalid_policy
+    it_behaves_like :invalid_policy, field: "name" do
+      before { I18n.available_locales = %i[en ru] }
+    end
+    it_behaves_like :valid_policy,   field: "email"
   end
 end

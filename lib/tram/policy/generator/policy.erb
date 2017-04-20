@@ -1,4 +1,9 @@
+# TODO: describe the policy, its subject and context
 class <%= klass %> < Tram::Policy
+  # TODO: add default values     (default: -> { ... }),
+  #       coercers               (type: proc(&:to_s)),
+  #       and optional arguments (optional: true)
+  #       when necessary
 <% parsed_params.each do |param| -%>
   param :<%= param %>
 <% end -%>
@@ -7,14 +12,16 @@ class <%= klass %> < Tram::Policy
 <% end -%>
 
 <% parsed_validators.each do |validator| -%>
-  validate :<%= validator %>
+  validate :<%= validator[:name] %>
 <% end -%>
 
   private
 <% parsed_validators.each do |validator| %>
   def <%= validator %>
-    return if true # define a condition
-    errors.add :<%= validator %> # add necessary tags
+    # TODO: define a condition
+    return if true
+    # TODO: add necessary tags
+    errors.add :<%= validator[:key] %>
   end
 <% end -%>
 end

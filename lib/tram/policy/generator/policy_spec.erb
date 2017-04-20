@@ -1,17 +1,26 @@
 require "spec_helper"
+# TODO: move it to spec_helper
+require "tram/policy/rspec"
 
-RSpec.describe <%= klass %>, "#valid?" do
-  subject(:policy) { described_class[<%= policy_signature.join(", ") %>] }
-
+RSpec.describe <%= klass %>, ".[]" do
+  # TODO: either remove this line, or set another source for available locales
+  let(:available_locales) { I18n.available_locales }
 <% (parsed_params + parsed_options).each do |name| -%>
   let(:<%= name %>) { FactoryGirl.build :<%= name %> }
 <% end -%>
 
-  it { is_expected.to be_valid }
+  it "is valid with proper arguments" do
+    expect { described_class[<%= policy_signature %>] }.not_to be_invalid_at
+  end
 <% parsed_validators.each do |validator| %>
-  it "is invalid when not <%= validator %>" do
-    policy # modify it correspondingly
-    expect { policy }.to be_invalid_at # add tags to check
+  # TODO: fix default description
+  it "is invalid when not <%= validator[:name] %>" do
+    # TODO: modify some arguments
+<% (parsed_params + parsed_options).each do |name| -%>
+    <%= name %> = nil
+<% end -%>
+    # TODO: add necessary tags to focus the condition
+    expect { described_class[<%= policy_signature %>] }.to be_invalid_at
   end
 <% end -%>
 end
