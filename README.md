@@ -172,6 +172,36 @@ rescue Tram::Policy::ValidationError => error
 end
 ```
 
+## Additional options
+
+Class method `.validate` supports several options:
+
+### `stop_on_faiure`
+
+If a selected validation will fail (adds an error to the collection), the following validations won't be executed.
+
+```ruby
+require "tram-policy"
+
+class Article::ReadinessPolicy < Tram::Policy
+  # required param for article to validate
+  param  :article
+
+  validate :title_presence, stop_on_failure: true
+  validate :title_valid # not executed if title is absent
+
+  # ...
+end
+```
+
+### `if`
+
+[WIP] Not implemented (coming soon in v0.1.0)
+
+### `unless`
+
+[WIP] Not implemented (coming soon in v0.1.0)
+
 ## RSpec matchers
 
 RSpec matchers defined in a file `tram-policy/matcher` (not loaded in runtime).

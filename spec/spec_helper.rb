@@ -19,9 +19,6 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
 
   # Prepare the Test namespace for constants defined in specs
-  config.around(:each) do |example|
-    Test = Class.new(Module)
-    example.run
-    Object.send :remove_const, :Test
-  end
+  config.before(:each) { Test = Class.new(Module) }
+  config.after(:each)  { Object.send :remove_const, :Test }
 end

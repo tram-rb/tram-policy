@@ -25,9 +25,23 @@ module Tram
                                 default: [],
                                 aliases: "-v",
                                 banner:  "validator[ validator]"
+      class_option :locales,    desc:    "list of available_locales",
+                                type:    :array,
+                                default: [],
+                                aliases: "-l",
+                                banner:  "en[ ru]"
 
       def self.source_root
         File.dirname(__FILE__)
+      end
+
+      def set_available_locales
+        @available_locales = \
+          if Array(options[:locales]).any?
+            options[:locales]
+          else
+            ask("Enter available locales for translation:").scan(/\w{2}/)
+          end
       end
 
       def generate_class
@@ -39,7 +53,8 @@ module Tram
           @locale = locale
           add_locale
           localize_policy
-          parsed_validators.each { |validator| localize_validator(validator) }
+          parsed_validators.sort_by { |v| v[:key] }
+                           .each { |validator| localize_validator(validator) }
         end
       end
 
@@ -48,6 +63,10 @@ module Tram
       end
 
       no_tasks do
+        def available_locales
+          @available_locales ||= []
+        end
+
         def klass
           @klass ||= Inflector.camelize name
         end
@@ -76,10 +95,6 @@ module Tram
             parsed_params + \
             parsed_options.map { |option| "#{option}: #{option}" }
           ).join(", ")
-        end
-
-        def available_locales
-          ask("What locales should be used for translation?").scan(/\w{2}/)
         end
 
         def locale_file

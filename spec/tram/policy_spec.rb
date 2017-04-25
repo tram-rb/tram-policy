@@ -5,7 +5,9 @@ RSpec.describe Tram::Policy do
     class Test::UserPolicy < Tram::Policy
       param :user
 
-      validate :name, "email", %w[email name]
+      validate :name
+      validate "email"
+      validate "name"
 
       private
 
@@ -52,6 +54,26 @@ RSpec.describe Tram::Policy do
       expect(user).to receive(:login).once.ordered
 
       Test::AdminPolicy.new(user)
+    end
+
+    context "when :stop_on_failure is set" do
+      before { Test::UserPolicy.validate :name, stop_on_failure: true }
+
+      it "stops validation after failure" do
+        expect(user).to receive(:name).once
+        expect(user).not_to receive(:email)
+
+        Test::UserPolicy.new(user)
+      end
+
+      it "continues validation after success" do
+        user = double :user, name: "Andy", email: nil, login: nil
+
+        expect(user).to receive(:name).once.ordered
+        expect(user).to receive(:email).once.ordered
+
+        Test::UserPolicy.new(user)
+      end
     end
   end
 

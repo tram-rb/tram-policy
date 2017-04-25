@@ -17,7 +17,7 @@ class <%= klass %> < Tram::Policy
 
   private
 <% parsed_validators.each do |validator| %>
-  def <%= validator %>
+  def <%= validator[:name] %>
     # TODO: define a condition
     return if true
     # TODO: add necessary tags

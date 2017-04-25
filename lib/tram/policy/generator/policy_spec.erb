@@ -12,9 +12,9 @@ RSpec.describe <%= klass %>, ".[]" do
   it "is valid with proper arguments" do
     expect { described_class[<%= policy_signature %>] }.not_to be_invalid_at
   end
-<% parsed_validators.each do |validator| %>
+<% parsed_validators.each do |v| %>
   # TODO: fix default description
-  it "is invalid when not <%= validator[:name] %>" do
+  it "is invalid when <%= "not " if v[:key] == v[:name] %><%= v[:key] %>" do
     # TODO: modify some arguments
 <% (parsed_params + parsed_options).each do |name| -%>
     <%= name %> = nil
