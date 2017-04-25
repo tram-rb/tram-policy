@@ -25,9 +25,23 @@ module Tram
                                 default: [],
                                 aliases: "-v",
                                 banner:  "validator[ validator]"
+      class_option :locales,    desc:    "list of available_locales",
+                                type:    :array,
+                                default: [],
+                                aliases: "-l",
+                                banner:  "en[ ru]"
 
       def self.source_root
         File.dirname(__FILE__)
+      end
+
+      def set_available_locales
+        @available_locales = \
+          if Array(options[:locales]).any?
+            options[:locales]
+          else
+            ask("Enter available locales for translation:").scan(/\w{2}/)
+          end
       end
 
       def generate_class
@@ -39,7 +53,8 @@ module Tram
           @locale = locale
           add_locale
           localize_policy
-          parsed_validators.each { |validator| localize_validator(validator) }
+          parsed_validators.sort_by { |v| v[:key] }
+                           .each { |validator| localize_validator(validator) }
         end
       end
 
@@ -48,6 +63,10 @@ module Tram
       end
 
       no_tasks do
+        def available_locales
+          @available_locales ||= []
+        end
+
         def klass
           @klass ||= Inflector.camelize name
         end
@@ -65,17 +84,17 @@ module Tram
         end
 
         def parsed_validators
-          @parsed_validators ||= options[:validators].map(&:downcase)
+          @parsed_validators ||= options[:validators].map do |str|
+            name, key = str.downcase.split(":")
+            { name: name, key: key || name }
+          end
         end
 
         def policy_signature
-          @policy_signature ||= \
+          @policy_signature ||= (
             parsed_params + \
             parsed_options.map { |option| "#{option}: #{option}" }
-        end
-
-        def available_locales
-          ask("What locales should be used for translation?").scan(/\w{2}/)
+          ).join(", ")
         end
 
         def locale_file
@@ -90,8 +109,8 @@ module Tram
           @locale_group ||= "  #{file}:\n"
         end
 
-        def locale_line(validator)
-          "    #{validator}: #{validator}\n"
+        def locale_line(key)
+          "    #{key}: translation missing\n"
         end
 
         def add_locale
@@ -102,8 +121,8 @@ module Tram
           append_to_file(locale_file, locale_group)
         end
 
-        def localize_validator(name)
-          insert_into_file locale_file, locale_line(name), after: locale_group
+        def localize_validator(key:, **)
+          insert_into_file locale_file, locale_line(key), after: locale_group
         end
       end
     end

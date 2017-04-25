@@ -8,6 +8,7 @@ module Tram
     require_relative "policy/inflector"
     require_relative "policy/error"
     require_relative "policy/errors"
+    require_relative "policy/validator"
 
     extend Dry::Initializer
 
@@ -17,8 +18,8 @@ module Tram
       # @param  [#to_sym, Array<#to_sym>] names
       # @return [self]
       #
-      def validate(*names)
-        @validators = validators | names.flatten.map(&:to_sym)
+      def validate(name, **opts)
+        validators[name.to_sym] = opts
         self
       end
 
@@ -34,12 +35,12 @@ module Tram
       private
 
       def validators
-        @validators ||= []
+        @validators ||= {}
       end
 
       def inherited(klass)
         super
-        klass.validate validators
+        validators.each { |name, opts| klass.validate name, opts }
       end
     end
 
@@ -107,7 +108,11 @@ module Tram
     def initialize(*)
       super
       @__scope__ = Inflector.underscore(self.class.name)
-      self.class.send(:validators).each { |name| send(name) }
+      self.class.send(:validators).each do |name, opts|
+        size = errors.count
+        send(name)
+        break if (errors.count > size) && opts[:stop_on_failure]
+      end
     end
   end
 end

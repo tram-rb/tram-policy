@@ -172,6 +172,36 @@ rescue Tram::Policy::ValidationError => error
 end
 ```
 
+## Additional options
+
+Class method `.validate` supports several options:
+
+### `stop_on_faiure`
+
+If a selected validation will fail (adds an error to the collection), the following validations won't be executed.
+
+```ruby
+require "tram-policy"
+
+class Article::ReadinessPolicy < Tram::Policy
+  # required param for article to validate
+  param  :article
+
+  validate :title_presence, stop_on_failure: true
+  validate :title_valid # not executed if title is absent
+
+  # ...
+end
+```
+
+### `if`
+
+[WIP] Not implemented (coming soon in v0.1.0)
+
+### `unless`
+
+[WIP] Not implemented (coming soon in v0.1.0)
+
 ## RSpec matchers
 
 RSpec matchers defined in a file `tram-policy/matcher` (not loaded in runtime).
@@ -197,7 +227,7 @@ end
 
 ```ruby
 # spec/spec_helper.rb
-require "tram-policy/matcher"
+require "tram/policy/rspec"
 ```
 
 ```ruby
@@ -217,14 +247,14 @@ RSpec.describe User::ReadinessPolicy do
 end
 ```
 
-**Notice** that you have to wrap policy into block `{ policy }`. This is because matcher checks not only presence of an error, but also ensures its message is translated to all available locales (`I18n.available_locales`). The block containing a policy will be executed separately for every such language.
+**Notice** that you have to wrap policy into block `{ policy }`. This is because the matcher checks not only presence of an error, but also ensures its message is translated to all available locales (`I18n.available_locales`). The block containing a policy will be executed separately for every such language.
 
 ## Generators
 
 The gem provides simple tool for scaffolding new policy along with RSpec test template.
 
 ```shell
-$ tram-policy user/readiness_policy -p user -o admin -v name_present email_present
+$ tram-policy user/readiness_policy -p user -o admin -v name_present:blank_name email_present:blank_email
 ```
 
 This will generate a policy class with specification compatible to both [RSpec][rspec] and [FactoryGirl][factory-girl]:
@@ -232,7 +262,13 @@ This will generate a policy class with specification compatible to both [RSpec][
 
 ```ruby
 # app/policies/user/readiness_policy.rb
+
+# TODO: describe the policy, its subject and context
 class User::ReadinessPolicy < Tram::Policy
+  # TODO: add default values     (default: -> { ... }),
+  #       coercers               (type: proc(&:to_s)),
+  #       and optional arguments (optional: true)
+  #       when necessary
   param  :user
   option :admin
 
@@ -242,13 +278,17 @@ class User::ReadinessPolicy < Tram::Policy
   private
 
   def name_present
-    return if true # modify condition
-    errors.add :name_present # add necessary tags
+    # TODO: define a condition
+    return if true
+    # TODO: add necessary tags
+    errors.add :blank_name
   end
 
   def email_present
-    return if true # modify condition
-    errors.add :email_present # add necessary tags
+    # TODO: define a condition
+    return if true
+    # TODO: add necessary tags
+    errors.add :blank_email
   end
 end
 ```
@@ -258,32 +298,46 @@ end
 ---
 en:
   user/readiness_policy:
-    name_present:  name_present
-    email_present: email_present
+    blank_name: translation missing
+    blank_email: translation missing
 ```
 
 ```ruby
 # spec/policies/user/readiness_policy_spec.rb
-RSpec.describe User::ReadinessPolicy do
-  let(:user) { build :user } # <- expected a factory
+require "spec_helper"
+# TODO: move it to spec_helper
+require "tram/policy/rspec"
 
-  subject(:policy) { described_class[user] }
+RSpec.describe User::ReadinessPolicy, ".[]" do
+  # TODO: either remove this line, or set another source for locales to check
+  let(:available_locales) { I18n.available_locales }
+  let(:user) { FactoryGirl.build :user }
 
-  it { is_expected.to be_valid }
-
-  it "is invalid when not name_present" do
-    policy # modify it correspondingly
-    expect { policy }.to be_invalid_at # add tags to check
+  it "is valid with proper arguments" do
+    expect { described_class[user] }.to be_valid
   end
 
+  # TODO: check the description
+  it "is invalid when not name_present" do
+    # TODO: modify some arguments
+    user = nil
+    # TODO: add necessary tags to focus the condition
+    expect { described_class[user] }.to be_invalid_at
+  end
+
+  # TODO: check the description
   it "is invalid when not email_present" do
-    policy # modify it correspondingly
-    expect { policy }.to be_invalid_at # add tags to check
+    # TODO: modify some arguments
+    user = nil
+    # TODO: add necessary tags to focus the condition
+    expect { described_class[user] }.to be_invalid_at
   end
 end
 ```
 
-Later you can copy-paste that contexts to provide more edge case for testing your policies.
+Then you should go through all TODO-s and add necessary details.
+
+Later you can copy-paste examples to provide more edge case for testing your policies.
 
 Notice that RSpec matcher `be_invalid_at` checks at once:
 
@@ -291,7 +345,10 @@ Notice that RSpec matcher `be_invalid_at` checks at once:
 - that the error has given tags
 - that the error is translated to every available locale
 
-and provides full description for the essence of the failure.
+Its negation (`not_to be_invalid_at`) checks that no errors added with given tags.
+When called without tags, it checks that the policy is valid as a whole.
+
+Both matchers provide a full description for the essence of the failure.
 
 ## To Recap
 
