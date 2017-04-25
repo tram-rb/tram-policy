@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require File.expand_path("lib/tram/policy/generator", Dir.pwd)
+
+Tram::Policy::Generator.start

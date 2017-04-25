@@ -1,3 +1,8 @@
+begin
+  require "pry"
+rescue
+  nil
+end
 require "bundler/setup"
 require "tram/policy"
 require "rspec/tram/policy/matchers"

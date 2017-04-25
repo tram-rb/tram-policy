@@ -1,0 +1,20 @@
+class <%= klass %> < Tram::Policy
+<% parsed_params.each do |param| -%>
+  param :<%= param %>
+<% end -%>
+<% parsed_options.each do |option| -%>
+  option :<%= option %>
+<% end -%>
+
+<% parsed_validators.each do |validator| -%>
+  validate :<%= validator %>
+<% end -%>
+
+  private
+<% parsed_validators.each do |validator| %>
+  def <%= validator %>
+    return if true # define a condition
+    errors.add :<%= validator %> # add necessary tags
+  end
+<% end -%>
+end
