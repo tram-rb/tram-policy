@@ -1,61 +1,69 @@
+require "spec_helper"
+
 RSpec.describe Tram::Policy::Error do
-  subject(:error) { described_class.new "Something bad happened", tags }
-
-  let(:tags) { { level: "warning" } }
-
-  describe "#message" do
-    subject { error.message }
-    it { is_expected.to eq "Something bad happened" }
+  before do
+    class NameSpace; end
+    Tram::Policy::Inflector.translate(NameSpace.new)
   end
 
-  describe "#full_message" do
-    subject { error.full_message }
-
-    context "with tags:" do
-      it { is_expected.to eq "Something bad happened {:level=>\"warning\"}" }
-    end
-
-    context "without tags:" do
-      let(:tags) { {} }
-      it { is_expected.to eq "Something bad happened" }
-    end
+  let(:tram_policy_error) do
+    Tram::Policy::Error.new(
+      :test_locale,
+      field: "title",
+      level: "error"
+    )
   end
 
-  describe "#to_h" do
-    subject { error.to_h }
-    it { is_expected.to eq message: "Something bad happened", level: "warning" }
+  let(:diff_tram_policy_error) do
+    Tram::Policy::Error.new(
+      "Diff error",
+      field: "title",
+      level: "error"
+    )
   end
 
-  describe "#==" do
-    subject { error == other }
-
-    context "when other object has the same #to_h:" do
-      let(:other) { double to_h: error.to_h }
-      it { is_expected.to eq true }
-    end
-
-    context "when other object has different #to_h:" do
-      let(:other) { double to_h: error.to_h.merge(foo: :bar) }
-      it { is_expected.to eq false }
-    end
-
-    context "when other object not respond to #to_h:" do
-      let(:other) { double }
-      it { is_expected.to eq false }
-    end
+  context "Support following methods" do
+    it { expect(tram_policy_error).to respond_to(:tags) }
+    it { expect(tram_policy_error).to respond_to(:message) }
+    it { expect(tram_policy_error).to respond_to(:full_message) }
+    it { expect(tram_policy_error).to respond_to(:to_h) }
+    it { expect(tram_policy_error).to respond_to(:==) }
   end
 
-  describe "arbitrary tag" do
-    subject { error.send tag }
+  it "#tags" do
+    expect(tram_policy_error.tags).to include :field, :level
+  end
 
-    context "when tag is defined:" do
-      let(:tag) { "level" }
-      it { is_expected.to eq "warning" }
-    end
+  it "#message" do
+    expect(tram_policy_error.message).to eq("Test validation")
+  end
 
-    context "when tag not defined:" do
-      let(:tag) { :weight }
-      it { is_expected.to be_nil }
+  it "#full_message" do
+    expect(tram_policy_error.full_message).to eq \
+      "Test validation: {:field=>\"title\", :level=>\"error\"}"
+  end
+
+  it "#to_h" do
+    expect(tram_policy_error.to_h).to include :message, :field, :level
+  end
+
+  it "#==" do
+    expect(tram_policy_error == tram_policy_error).to be true
+    expect(tram_policy_error == diff_tram_policy_error).to be false
+  end
+
+  context "undefined methods tags" do
+    it { expect(tram_policy_error.field).to eq("title") }
+    it { expect(tram_policy_error.level).to eq("error") }
+    it { expect(tram_policy_error.time).to be nil }
+  end
+
+  context "when tronslation messing" do
+    let(:translation) { Tram::Policy::Error.new(:missing) }
+
+    it "#message return translation message" do
+      expect(translation.message).to eq \
+        "translation missing: en.name_space.missing"
     end
   end
 end

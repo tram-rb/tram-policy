@@ -1,88 +1,47 @@
-class Tram::Policy
-  # Validation error with message and assigned tags
-  #
-  # Notice: an error is context-independent; it knows nothing about
-  #         a collection it is placed to; it can be safely moved
-  #         from one collection of [Tram::Policy::Errors] to another.
-  #
-  class Error
-    # Builds an error
-    #
-    # If another error is send to the constructor, the error returned unchanged
-    #
-    # @param  [Tram::Policy::Error, #to_s] value
-    # @param  [Hash<Symbol, Object>] opts
-    # @return [Tram::Policy::Error]
-    #
-    def self.new(value, **opts)
-      return value if value.is_a? self
-      super
-    end
+module Tram
+  class Policy::Error
+    attr_reader :message, :tags
 
-    # @!attribute [r] message
-    #
-    # @return [String] The error message text
-    #
-    attr_reader :message
-
-    # The full message (message and tags info)
-    #
-    # @return [String]
-    #
-    def full_message
-      [message, @tags].reject(&:empty?).join(" ")
-    end
-
-    # Converts the error to a simple hash with message and tags
-    #
-    # @return [Hash<Symbol, Object>]
-    #
-    def to_h
-      @tags.merge(message: message)
-    end
-
-    # Fetches either message or a tag
-    #
-    # @param [#to_sym] tag
-    # @return [Object]
-    #
-    def [](tag)
-      to_h[tag.to_sym]
-    end
-
-    # Fetches either message or a tag
-    #
-    # @param [#to_sym] tag
-    # @param [Object] default
-    # @param [Proc] block
-    # @return [Object]
-    #
-    def fetch(tag, default, &block)
-      to_h.fetch(tag.to_sym, default, &block)
-    end
-
-    # Compares an error to another object using method [#to_h]
-    #
-    # @param  [Object] other Other object to compare to
-    # @return [Boolean]
-    #
-    def ==(other)
-      other.respond_to?(:to_h) && other.to_h == to_h
-    end
-
-    private
-
-    def initialize(message, **tags)
-      @message = message.to_s
+    def initialize(message, tags = {})
       @tags = tags
+      @message = generate_message(message)
     end
 
-    def respond_to_missing?(*)
+    def to_h
+      { message: message }.merge(tags)
+    end
+
+    def generate_message(message)
+      Policy::Inflector.generate(message, tags)
+    end
+
+    def full_message
+      (tags.any? ? [message] << tags : [message]).join(": ")
+    end
+
+    def eql?(other)
+      return unless @tags.any?
+      @tags == other.tags &&
+      @message == other.message
+    end
+
+    def hash
+      @tags.hash + @message.hash
+    end
+
+    def ==(other)
+      eql?(other)
+    end
+
+    # rubocop: disable Style/MethodMissing
+    def method_missing(name)
+      # robocop When using method_missing, fall back on super
+      # we desidet return nil but i'm not sure
+      tags[name]
+    end
+
+    def respond_to_missing?
       true
-    end
-
-    def method_missing(name, *args, &block)
-      args.any? || block ? super : @tags[name]
     end
   end
 end

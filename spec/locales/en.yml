@@ -1,0 +1,6 @@
+---
+en:
+  article/readiness_policy:
+    empty_text: "Validation %{level}: %{field} is empty"
+  name_space:
+    test_locale: "Test validation"
