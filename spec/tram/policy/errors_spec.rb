@@ -1,135 +1,112 @@
-require "spec_helper"
-
 RSpec.describe Tram::Policy::Errors do
-  let(:tram_policy_errors) { Tram::Policy::Errors.new }
+  let(:policy) { double :policy, t: "OMG!" }
+  let(:errors) { described_class.new(policy) }
 
-  context "Support following methods" do
-    it { expect(tram_policy_errors).to respond_to(:add) }
-    it { expect(tram_policy_errors).to respond_to(:each) }
-    it { expect(tram_policy_errors).to respond_to(:messages) }
-    it { expect(tram_policy_errors).to respond_to(:full_messages) }
+  describe ".new" do
+    subject { errors }
+
+    it { is_expected.to be_kind_of Enumerable }
+    it { is_expected.to respond_to :empty? }
+    it { is_expected.to be_empty }
+    its(:policy) { is_expected.to eql policy }
   end
 
-  it "#add" do
-    tram_policy_errors.add("Title is empty", { field: "title", level: "error" })
-    expect(tram_policy_errors.count).to eq(1)
-  end
+  describe "#add" do
+    subject     { errors.add :omg, level: "info", field: "name" }
+    let(:error) { errors.to_a.last }
 
-  it "#any?" do
-    tram_policy_errors.add("Title is empty", { field: "title", level: "error" })
-    expect(tram_policy_errors.any?).to be true
-  end
+    it "adds an error to the collection:" do
+      expect { 2.times { subject } }.to change { errors.count }.by 1
 
-  context "When duble message, tags" do
-    it "same message and tags" do
-      tram_policy_errors.add(
-        "Title is empty",
-        { field: "title", level: "error" }
-      )
-      tram_policy_errors.add(
-        "Title is empty",
-        { field: "title", level: "error" }
-      )
-      expect(tram_policy_errors.count).to eq 1
-    end
-
-    it "same message and diff tags value" do
-      tram_policy_errors.add(
-        "Title is empty",
-        { field: "title", level: "error" }
-      )
-      tram_policy_errors.add(
-        "Title is empty",
-        { field: "admin_title", level: "error" }
-      )
-      expect(tram_policy_errors.count).to eq 2
-    end
-
-    it "same message and diff tags level" do
-      tram_policy_errors.add(
-        "Title is empty",
-        { field: "title", level: "error" }
-      )
-      tram_policy_errors.add(
-        "Title is empty",
-        { field: "admin_title", level: "warning" }
-      )
-      expect(tram_policy_errors.count).to eq 2
-    end
-
-    it "same tags and diff message" do
-      tram_policy_errors.add(
-        "Title is empty",
-        { field: "title", level: "error" }
-      )
-      tram_policy_errors.add(
-        "Title empty",
-        { field: "title", level: "error" }
-      )
-      expect(tram_policy_errors.count).to eq 2
+      expect(error).to be_kind_of Tram::Policy::Error
+      expect(error).to eq message: "OMG!", level: "info", field: "name"
     end
   end
 
-  context "Loack at errors closer" do
+  describe "#merge" do
+    let(:other) { described_class.new(policy) }
+
     before do
-      tram_policy_errors.add(
-        "Title is empty",
-        { field: "title", level: "error" }
-      )
-      tram_policy_errors.add(
-        "Label is empty",
-        { field: "label", level: "error" }
-      )
+      errors.add "D'OH!", level: "disaster"
+      other.add  "OUCH!", level: "error"
     end
 
-    it "#messages" do
-      expect(tram_policy_errors.messages).to match_array \
-        ["Title is empty", "Label is empty"]
+    context "without a block:" do
+      subject { errors.merge(other) }
+
+      it "merges other collection as is" do
+        expect(subject).to be_a Tram::Policy::Errors
+        expect(subject.map(&:to_h)).to match_array [
+          { message: "OMG!", level: "disaster" },
+          { message: "OMG!", level: "error" }
+        ]
+      end
     end
 
-    it "#full_messages" do
-      expect(tram_policy_errors.full_messages).to match_array [
-        "Title is empty: {:field=>\"title\", :level=>\"error\"}",
-        "Label is empty: {:field=>\"label\", :level=>\"error\"}"
-      ]
+    context "with a block:" do
+      subject { errors.merge(other) { |err| err.merge(source: "Homer") } }
+
+      it "merges filtered collection as is" do
+        expect(subject).to be_a Tram::Policy::Errors
+        expect(subject.map(&:to_h)).to match_array [
+          { message: "OMG!", level: "disaster" },
+          { message: "OMG!", level: "error", source: "Homer" }
+        ]
+      end
     end
 
-    it "#tags level" do
-      expect(tram_policy_errors.filter do |error|
-        error.tags[:level] == "error"
-      end.count).to be 2
-    end
-
-    it "#tags field" do
-      expect(tram_policy_errors.filter do |error|
-        error.tags[:field] == "title"
-      end.count).to be 1
-    end
-
-    it "#errors level" do
-      expect(tram_policy_errors.filter do |error|
-        error.level == "error"
-      end.count).to be 2
-    end
-
-    it "#errors field" do
-      expect(tram_policy_errors.filter do |error|
-        error.field == "title"
-      end.count).to be 1
+    context "not errors:" do
+      subject { errors.merge 1 }
+      it { is_expected.to eql errors }
     end
   end
 
-  context "when tag is empty" do
+  describe "#messages" do
+    subject { errors.messages }
+
+    it { is_expected.to eq [] }
+
+    context "with errors added:" do
+      before  { errors.add "OMG!", level: "info", field: "name" }
+      it { is_expected.to eq %w[OMG!] }
+    end
+  end
+
+  describe "#full_messages" do
+    subject { errors.full_messages }
+
+    it { is_expected.to eq [] }
+
+    context "with errors added:" do
+      before  { errors.add "OMG!", level: "info", field: "name" }
+      it { is_expected.to eq ["OMG! {:level=>\"info\", :field=>\"name\"}"] }
+    end
+  end
+
+  describe "#by_tags" do
     before do
-      tram_policy_errors.add("Title is empty")
-      tram_policy_errors.add("Name is empty")
+      errors.add :foo, field: "name",  level: "error"
+      errors.add :foo, field: "email", level: "info"
+      errors.add :foo, field: "email", level: "error"
     end
 
-    it "#full_messages" do
-      expect(tram_policy_errors.full_messages).to match_array [
-        "Title is empty",
-        "Name is empty"
-      ]
+    context "with filter" do
+      subject { errors.by_tags level: "error" }
+
+      it "returns selected errors only" do
+        expect(subject.map(&:to_h)).to match_array [
+          { message: "OMG!", field: "name",  level: "error" },
+          { message: "OMG!", field: "email", level: "error" }
+        ]
+      end
+    end
+
+    context "without a filter" do
+      subject { errors.by_tags }
+
+      it "returns selected all errors" do
+        expect(subject.map(&:to_h)).to match_array errors.to_a
+      end
     end
   end
 end
