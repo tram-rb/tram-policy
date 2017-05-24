@@ -23,6 +23,18 @@ RSpec.describe Tram::Policy::Errors do
     end
   end
 
+  describe "#empty?" do
+    subject { errors.add :omg, level: "info", field: "name" }
+
+    it "checks whether error present" do
+      expect(subject).not_to be_empty
+    end
+
+    it "accepts a block" do
+      expect(subject.empty? { |error| error.level != "info" }).to eq true
+    end
+  end
+
   describe "#merge" do
     let(:other) { described_class.new(policy) }
 

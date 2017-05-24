@@ -51,8 +51,8 @@ class Tram::Policy
     #
     # @return [Boolean]
     #
-    def empty?
-      !any?
+    def empty?(&block)
+      block ? !any?(&block) : !any?
     end
 
     # The array of ordered error messages
