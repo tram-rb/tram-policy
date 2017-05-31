@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.0] - [2017-05-31]
+Contains backward-incompatible change.
+
+### Migration
+You should add the namespace to gem-related I18n translations.
+
+```yaml
+# config/locales/tram-policy.en.yml
+---
+en:
+  tram-policy: # The namespace to be added
+    my_policy:
+      error_key: Error message
+```
+
+### Changed
+- [BREAKING] a namespace added to scopes for policy error translations (@nepalez)
+
 ## [0.0.3] - [2017-05-24]
 
 ### Fixed
