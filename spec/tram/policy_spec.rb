@@ -1,6 +1,11 @@
 RSpec.describe Tram::Policy do
   before do
     I18n.available_locales = %w[en]
+    I18n.backend.store_translations :en, {
+      "tram-policy" => {
+        "test/user_policy" => { "name_presence" => "Name is absent" }
+      }
+    }
 
     class Test::UserPolicy < Tram::Policy
       param :user
@@ -173,7 +178,11 @@ RSpec.describe Tram::Policy do
 
     before do
       I18n.backend.store_translations :en, {
-        "test/user_policy" => { "name_presence" => "%{level}: Name is absent" }
+        "tram-policy" => {
+          "test/user_policy" => {
+            "name_presence" => "%{level}: Name is absent"
+          }
+        }
       }
     end
 

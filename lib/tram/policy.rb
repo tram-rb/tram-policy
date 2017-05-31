@@ -107,7 +107,7 @@ module Tram
 
     def initialize(*)
       super
-      @__scope__ = Inflector.underscore(self.class.name)
+      @__scope__ = ["tram-policy", Inflector.underscore(self.class.name)]
       self.class.send(:validators).each do |name, opts|
         size = errors.count
         send(name)

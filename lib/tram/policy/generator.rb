@@ -102,15 +102,15 @@ module Tram
         end
 
         def locale_header
-          "---\n#{@locale}:\n"
+          "---\n#{@locale}:\n  tram-policy:\n"
         end
 
         def locale_group
-          @locale_group ||= "  #{file}:\n"
+          @locale_group ||= "    #{file}:\n"
         end
 
         def locale_line(key)
-          "    #{key}: translation missing\n"
+          "      #{key}: translation missing\n"
         end
 
         def add_locale
