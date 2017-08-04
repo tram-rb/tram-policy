@@ -1,24 +1,11 @@
 RSpec.describe "RSpec support:" do
-  subject { Test::UserPolicy[name: nil] }
-
   before do
     I18n.available_locales = %i[en]
-    I18n.backend.store_translations \
-      :en, { "test/user_policy" => { "name_presence" => "Name is absent" } }
-
-    class Test::UserPolicy < Tram::Policy
-      option :name
-
-      validate :name_presence
-
-      private
-
-      def name_presence
-        return if name
-        errors.add :name_presence, field: "name"
-      end
-    end
+    I18n.backend.store_translations :en, yaml_fixture_file("en.yml")["en"]
+    load_fixture "customer_policy.rb"
   end
+
+  subject { Test::CustomerPolicy[name: nil] }
 
   describe "to be_invalid_at" do
     it "passes when some translated error present w/o tags constraint" do

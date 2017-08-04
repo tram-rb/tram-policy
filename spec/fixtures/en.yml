@@ -1,0 +1,7 @@
+---
+en:
+  tram-policy:
+    test/customer_policy:
+      name_presence: Name is absent
+    test/user_policy:
+      name_presence: Name is absent

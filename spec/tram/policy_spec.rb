@@ -1,38 +1,10 @@
 RSpec.describe Tram::Policy do
   before do
     I18n.available_locales = %w[en]
-    I18n.backend.store_translations :en, {
-      "tram-policy" => {
-        "test/user_policy" => { "name_presence" => "Name is absent" }
-      }
-    }
+    I18n.backend.store_translations :en, yaml_fixture_file("en.yml")["en"]
 
-    class Test::UserPolicy < Tram::Policy
-      param :user
-
-      validate :name
-      validate "email"
-      validate "name"
-
-      private
-
-      def name
-        errors.add "No name", level: "warning" unless user.name
-      end
-
-      def email
-        user.email
-      end
-
-      def login
-        user.login
-      end
-    end
-
-    class Test::AdminPolicy < Test::UserPolicy
-      validate :login
-      validate :name
-    end
+    load_fixture "user_policy.rb"
+    load_fixture "admin_policy.rb"
   end
 
   let(:policy) { Test::UserPolicy[user] }

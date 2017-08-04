@@ -8,6 +8,8 @@ require "tram/policy"
 require "tram/policy/rspec"
 require "rspec/its"
 
+require_relative "support/fixtures_helper.rb"
+
 RSpec.configure do |config|
   config.example_status_persistence_file_path = ".rspec_status"
   config.expect_with :rspec do |c|
