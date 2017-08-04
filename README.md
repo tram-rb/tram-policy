@@ -153,8 +153,9 @@ end
 # /config/locales/en.yml
 ---
 en:
-  article/publication_policy:
-    empty_text: "Validation %{level}: %{field} is empty"
+  tram-policy:
+    article/publication_policy:
+      empty_text: "Validation %{level}: %{field} is empty"
 ```
 
 This will provide error message "Validation error: text is empty".
@@ -296,9 +297,10 @@ end
 # config/tram-policies.en.yml
 ---
 en:
-  user/readiness_policy:
-    blank_name: translation missing
-    blank_email: translation missing
+  tram-policy:
+    user/readiness_policy:
+      blank_name: translation missing
+      blank_email: translation missing
 ```
 
 ```ruby
