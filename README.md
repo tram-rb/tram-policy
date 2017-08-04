@@ -126,12 +126,12 @@ class Article::PublicationPolicy < Tram::Policy
 
   def article_readiness
     # Collects errors tagged by level: "error" from "nested" policy
-    others = Article::ReadinessPolicy[article].errors.by_tags(level: "error")
+    readiness_errors = Article::ReadinessPolicy[article].errors.by_tags(level: "error")
 
     # Merges collected errors to the current ones.
-    # New errors are tagged by source: "readiness".
+    # New errors are also tagged by source: "readiness".
     # Notice the block takes _hashified_ errors.
-    errors.merge(others) { |hash| hash[:source] = "readiness" }
+    errors.merge(readiness_errors, source: "readiness")
   end
 
   def article_selection
