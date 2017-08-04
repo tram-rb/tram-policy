@@ -130,7 +130,6 @@ class Article::PublicationPolicy < Tram::Policy
 
     # Merges collected errors to the current ones.
     # New errors are also tagged by source: "readiness".
-    # Notice the block takes _hashified_ errors.
     errors.merge(readiness_errors, source: "readiness")
   end
 
