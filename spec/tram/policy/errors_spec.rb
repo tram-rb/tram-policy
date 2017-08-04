@@ -67,6 +67,30 @@ RSpec.describe Tram::Policy::Errors do
       end
     end
 
+    context "with options:" do
+      subject { errors.merge(other, source: "Homer") }
+
+      it "merges other collection with given options" do
+        expect(subject).to be_a Tram::Policy::Errors
+        expect(subject.map(&:to_h)).to match_array [
+          { message: "OMG!", level: "disaster" },
+          { message: "OMG!", level: "error", source: "Homer" }
+        ]
+      end
+    end
+
+    context "with block and options:" do
+      subject { errors.merge(other, id: 5) { |err| err.merge id: 3, age: 4 } }
+
+      it "merges filtered collection with given options" do
+        expect(subject).to be_a Tram::Policy::Errors
+        expect(subject.map(&:to_h)).to match_array [
+          { message: "OMG!", level: "disaster" },
+          { message: "OMG!", level: "error", id: 5, age: 4 }
+        ]
+      end
+    end
+
     context "not errors:" do
       subject { errors.merge 1 }
       it { is_expected.to eql errors }

@@ -80,13 +80,12 @@ class Tram::Policy
     # @example Add some tag to merged errors
     #   policy.merge(other) { |err| err[:source] = "other" }
     #
-    def merge(other)
-      return self unless other.is_a?(self.class) && other.any?
+    def merge(other, **options)
+      return self unless other.is_a?(self.class)
 
-      if block_given?
-        other.each { |err| add yield(err.to_h) }
-      else
-        @set |= other.to_a
+      other.each do |err|
+        new_err = block_given? ? yield(err.to_h) : err.to_h
+        add new_err.merge(options)
       end
 
       self
