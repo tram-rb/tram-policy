@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name     = "tram-policy"
-  gem.version  = "0.1.0"
+  gem.version  = "0.1.1"
   gem.author   = ["Viktor Sokolov (gzigzigzeo)", "Andrew Kozin (nepalez)"]
   gem.email    = ["andrew.kozin@gmail.com"]
   gem.homepage = "https://github.com/tram/tram-policy"

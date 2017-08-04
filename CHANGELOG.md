@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.1] - [2017-08-04]
+
+### Added
+- Support for options in errors.merge (@nepalez)
+
+    # adds `field: "user"` to every merged error
+    errors.merge other_policy.errors, field: "user"
+
 ## [0.1.0] - [2017-05-31]
 Contains backward-incompatible change.
 
@@ -53,3 +61,5 @@ This is a first public release (@nepalez, @charlie-wasp, @JewelSam, @sergey-chec
 [0.0.1]: https://github.com/tram-rb/tram-policy/releases/tag/v0.0.1
 [0.0.2]: https://github.com/tram-rb/tram-policy/compare/v0.0.1...v0.0.2
 [0.0.3]: https://github.com/tram-rb/tram-policy/compare/v0.0.2...v0.0.3
+[0.1.0]: https://github.com/tram-rb/tram-policy/compare/v0.0.3...v0.1.0
+[0.1.1]: https://github.com/tram-rb/tram-policy/compare/v0.1.0...v0.1.1
