@@ -43,7 +43,7 @@ class Article::ReadinessPolicy < Tram::Policy
   # define what methods and in what order we should use to validate an article
   validate :title_presence
   validate :subtitle_presence
-  validate :text_presence
+  validate { errors.add :empty, field: "text", level: "error" if text.empty? }
 
   private
 
@@ -58,13 +58,6 @@ class Article::ReadinessPolicy < Tram::Policy
     return unless subtitle.empty?
     # Notice that we can set another level
     errors.add "Subtitle is empty", field: "subtitle", level: "warning"
-  end
-
-  def text_presence
-    return unless text.empty?
-    # Adds an error with a translated message. All fields are available
-    # both as error tags, and I18n translation options
-    errors.add :empty_text, field: "text", level: "error"
   end
 end
 ```
@@ -139,12 +132,16 @@ class Article::PublicationPolicy < Tram::Policy
 end
 ```
 
-As mentioned above, sending a symbolic key to the `errors#add` means the key should be translated by [I18n][i18n]. The only magic under the hood is that a scope for the translation is taken from the full name of current class. All tags are available as options:
+As mentioned above, sending a symbolic key to the `errors#add` means the key should be translated by [I18n][i18n]. The only magic under the hood concerns a scope for the translation. By default it is taken from the full name of current class prepended with `"evil.client.errors"`.
+
+> You can redefine the scope by reloading private method `.scope` of the policy.
+
+All tags are available as options:
 
 ```ruby
 class Article::PublicationPolicy < Tram::Policy
   # ...
-  errors.add :empty_text, field: "text", level: "error"
+  errors.add :empty, field: "text", level: "error"
   # ...
 end
 ```
@@ -155,7 +152,7 @@ end
 en:
   tram-policy:
     article/publication_policy:
-      empty_text: "Validation %{level}: %{field} is empty"
+      empty: "Validation %{level}: %{field} is empty"
 ```
 
 This will provide error message "Validation error: text is empty".
@@ -193,14 +190,6 @@ class Article::ReadinessPolicy < Tram::Policy
   # ...
 end
 ```
-
-### `if`
-
-[WIP] Not implemented (coming soon in v0.1.0)
-
-### `unless`
-
-[WIP] Not implemented (coming soon in v0.1.0)
 
 ## RSpec matchers
 

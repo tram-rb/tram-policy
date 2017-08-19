@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.0] - [2017-08-19]
+
+### Added
+- Support for unnamed block validators (@nepalez)
+
+  In addition to instance methods:
+
+    validate :some_method
+
+  You can use a block for validation:
+
+    validate { errors.add :blank_name if name.blank? }
+
+- Support for custom scopes (@nepalez)
+
+  Just reload private class method `scope`
+
+- Support for inheritance (@nepalez)
+
+  You can inherit the policy class. A subclass will apply all validators of
+  superclass before those of its own. Every error message will be translated
+  in the scope of policy where it was defined.
+
+### Deleted
+- Reloading of validators
+
+  To follow Liskov substitube principle we run all validators declared anywhere
+  in the policy or its superclasses. Any sub-policy should provide the same
+  level of confidence about validity of object(s) under check as any
+  of its superclasses.
+
 ## [0.1.1] - [2017-08-04]
 
 ### Added
@@ -63,3 +94,4 @@ This is a first public release (@nepalez, @charlie-wasp, @JewelSam, @sergey-chec
 [0.0.3]: https://github.com/tram-rb/tram-policy/compare/v0.0.2...v0.0.3
 [0.1.0]: https://github.com/tram-rb/tram-policy/compare/v0.0.3...v0.1.0
 [0.1.1]: https://github.com/tram-rb/tram-policy/compare/v0.1.0...v0.1.1
+[0.1.2]: https://github.com/tram-rb/tram-policy/compare/v0.1.1...v0.2.0
