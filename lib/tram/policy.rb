@@ -16,10 +16,11 @@ module Tram
       # Registers a validator
       #
       # @param  [#to_sym, Array<#to_sym>] names
+      # @option opts [Boolean] :stop_on_failure
       # @return [self]
       #
-      def validate(name, **opts)
-        validators[name.to_sym] = opts
+      def validate(name = nil, **opts, &block)
+        local << Validator.new(scope, name, block, opts)
         self
       end
 
@@ -34,13 +35,16 @@ module Tram
 
       private
 
-      def validators
-        @validators ||= {}
+      def scope
+        @scope ||= ["tram-policy", *Inflector.underscore(name)]
       end
 
-      def inherited(klass)
-        super
-        validators.each { |name, opts| klass.validate name, opts }
+      def local
+        @local ||= []
+      end
+
+      def all
+        ((self == Tram::Policy) ? [] : superclass.send(:all)) + local
       end
     end
 
@@ -107,11 +111,10 @@ module Tram
 
     def initialize(*)
       super
-      @__scope__ = ["tram-policy", Inflector.underscore(self.class.name)]
-      self.class.send(:validators).each do |name, opts|
+      self.class.send(:all).each do |validator|
         size = errors.count
-        send(name)
-        break if (errors.count > size) && opts[:stop_on_failure]
+        validator.check(self)
+        break if (errors.count > size) && validator.stop_on_failure
       end
     end
   end

@@ -6,7 +6,7 @@ class Tram::Policy
   else
     module Inflector
       def self.underscore(name)
-        name.dup.tap do |n|
+        name&.dup&.tap do |n|
           n.gsub!(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
           n.gsub!(/([a-z\d])([A-Z])/, '\1_\2')
           n.gsub!("::", "/")
@@ -16,7 +16,7 @@ class Tram::Policy
       end
 
       def self.camelize(name)
-        name.dup.tap do |n|
+        name&.dup&.tap do |n|
           n.gsub!(/(?:\A|_+)(.)/)    { $1.upcase }
           n.gsub!(%r{(?:[/|-]+)(.)}) { "::#{$1.upcase}" }
         end

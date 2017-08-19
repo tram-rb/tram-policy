@@ -19,16 +19,19 @@ RSpec.describe Tram::Policy do
 
   describe ".validate" do
     it "defines validators to be called by initializer in proper order" do
-      expect(user).to receive(:name).once.ordered
-      expect(user).to receive(:email).once.ordered
+      expect(user).to receive(:name).ordered
+      expect(user).to receive(:email).ordered
+      expect(user).to receive(:name).ordered
 
       Test::UserPolicy.new(user)
     end
 
     it "preserves order of parent class validators" do
-      expect(user).to receive(:name).once.ordered
-      expect(user).to receive(:email).once.ordered
-      expect(user).to receive(:login).once.ordered
+      expect(user).to receive(:name).ordered
+      expect(user).to receive(:email).ordered
+      expect(user).to receive(:name).ordered
+      expect(user).to receive(:login).ordered
+      expect(user).to receive(:name).ordered
 
       Test::AdminPolicy.new(user)
     end
@@ -37,19 +40,17 @@ RSpec.describe Tram::Policy do
       before { Test::UserPolicy.validate :name, stop_on_failure: true }
 
       it "stops validation after failure" do
-        expect(user).to receive(:name).once
-        expect(user).not_to receive(:email)
+        expect(user).not_to receive(:login)
 
-        Test::UserPolicy.new(user)
+        Test::AdminPolicy.new(user)
       end
 
       it "continues validation after success" do
         user = double :user, name: "Andy", email: nil, login: nil
 
-        expect(user).to receive(:name).once.ordered
-        expect(user).to receive(:email).once.ordered
+        expect(user).to receive(:login)
 
-        Test::UserPolicy.new(user)
+        Test::AdminPolicy.new(user)
       end
     end
   end

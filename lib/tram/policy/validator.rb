@@ -1,16 +1,26 @@
 class Tram::Policy
   # Describes a validator
   class Validator
-    attr_reader :name, :stop_on_failure
+    attr_reader :scope, :name, :block, :stop_on_failure
 
     def ==(other)
-      other.is_a?(self.class) && other.name == name
+      other.is_a?(self.class) && name && other.name == name
+    end
+
+    def check(object)
+      object.__send__ :instance_variable_set, :@__scope__, scope
+      name ? object.__send__(name) : object.instance_exec(&block)
+    rescue
+      object.__send__ :instance_variable_set, :@__scope__, nil
     end
 
     private
 
-    def initialize(name, stop_on_failure: false)
-      @name = name.to_sym
+    def initialize(scope, name, block, stop_on_failure: false)
+      @scope = scope
+      @name  = name&.to_sym
+      @block = block
+      raise "Provide either method name or a block" unless !name ^ !block
       @stop_on_failure = stop_on_failure
     end
   end
