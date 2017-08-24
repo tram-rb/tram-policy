@@ -132,7 +132,7 @@ class Article::PublicationPolicy < Tram::Policy
 end
 ```
 
-As mentioned above, sending a symbolic key to the `errors#add` means the key should be translated by [I18n][i18n]. The only magic under the hood concerns a scope for the translation. By default it is taken from the full name of current class prepended with `"evil.client.errors"`.
+As mentioned above, sending a symbolic key to the `errors#add` means the key should be translated by [I18n][i18n]. The only magic under the hood concerns a scope for the translation. By default it is taken from the full name of current class prepended with `"tram-policy"`.
 
 > You can redefine the scope by reloading private method `.scope` of the policy.
 
