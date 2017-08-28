@@ -44,7 +44,7 @@ module Tram
       end
 
       def all
-        ((self == Tram::Policy) ? [] : superclass.send(:all)) + local
+        (((self == Tram::Policy) ? [] : superclass.send(:all)) + local).uniq
       end
     end
 
@@ -111,6 +111,9 @@ module Tram
 
     def initialize(*)
       super
+
+      @__options__ = self.class.dry_initializer.attributes(self)
+
       self.class.send(:all).each do |validator|
         size = errors.count
         validator.check(self)

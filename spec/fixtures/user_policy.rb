@@ -1,7 +1,7 @@
 class Test::UserPolicy < Tram::Policy
   param :user
 
-  validate :name
+  validate "name"
   validate "email"
   validate "name"
 
