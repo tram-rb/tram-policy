@@ -5,6 +5,7 @@ module Tram
   class Policy
     require_relative "inflector"
 
+    # @private
     class Generator < Thor::Group
       include Thor::Actions
 

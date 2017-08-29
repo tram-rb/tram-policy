@@ -1,6 +1,7 @@
 require "dry-initializer"
 require "i18n"
 
+# Top-level scope for Tram collection of gems
 module Tram
   # Base class for policy objects with composable validation errors
   class Policy
@@ -13,9 +14,10 @@ module Tram
     extend Dry::Initializer
 
     class << self
+      # @!method validate(name, opts)
       # Registers a validator
       #
-      # @param  [#to_sym, Array<#to_sym>] names
+      # @param  [#to_sym, nil] name (nil)
       # @option opts [Boolean] :stop_on_failure
       # @return [self]
       #
@@ -54,7 +56,7 @@ module Tram
     # @param  [Hash<Symbol, Object>] options
     # @return [String]
     #
-    def t(message, **options)
+    def t(message, options = {})
       return message.to_s unless message.is_a? Symbol
       I18n.t message, options.merge(scope: @__scope__)
     end

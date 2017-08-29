@@ -8,7 +8,6 @@ Policy Object Pattern
 [![Gem Version][gem-badger]][gem]
 [![Build Status][travis-badger]][travis]
 [![Dependency Status][gemnasium-badger]][gemnasium]
-[![Code Climate][codeclimate-badger]][codeclimate]
 [![Inline docs][inch-badger]][inch]
 
 ## Intro

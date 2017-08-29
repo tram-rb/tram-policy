@@ -1,9 +1,12 @@
 class Tram::Policy
   if Object.const_defined? "ActiveSupport::Inflector"
+    # @private
     Inflector = ActiveSupport::Inflector
   elsif Object.const_defined? "Inflecto"
+    # @private
     Inflector = ::Inflecto
   else
+    # @private
     module Inflector
       def self.underscore(name)
         name&.dup&.tap do |n|

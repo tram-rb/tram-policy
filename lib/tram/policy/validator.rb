@@ -1,5 +1,5 @@
 class Tram::Policy
-  # Describes a validator
+  # @private
   class Validator
     attr_reader :scope, :name, :block, :stop_on_failure
 

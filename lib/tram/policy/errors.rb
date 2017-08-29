@@ -14,6 +14,7 @@ class Tram::Policy
     #
     attr_reader :policy
 
+    # @!method add(message, tags)
     # Adds error message to the collection
     #
     # @param [#to_s] message Either a message, or a symbolic key for translation
@@ -37,9 +38,10 @@ class Tram::Policy
       @set.each { |error| yield(error) }
     end
 
+    # @!method by_tags(filter)
     # Selects errors filtered by tags
     #
-    # @param  [Hash<Symbol, Object>] filter
+    # @param  [Hash<Symbol, Object>] filter List of options to filter by
     # @return [Hash<Symbol, Object>]
     #
     def by_tags(**filter)
@@ -47,6 +49,7 @@ class Tram::Policy
       reject { |error| (filter - error.to_h.to_a).any? }
     end
 
+    # @!method empty?
     # Checks whether a collection is empty
     #
     # @return [Boolean]
@@ -71,11 +74,14 @@ class Tram::Policy
       @set.map(&:full_message).sort
     end
 
+    # @!method merge(other, options)
     # Merges other collection to the current one and returns new collection
     # with the current scope
     #
-    # param [Tram::Policy::Errors] other Collection to be merged
-    # yieldparam [Hash<Symbol, Object>]
+    # @param [Tram::Policy::Errors] other   Collection to be merged
+    # @param [Hash<Symbol, Object>] options Options to be added to merged errors
+    # @yieldparam [Hash<Symbol, Object>] hash of error options
+    # @return [self]
     #
     # @example Add some tag to merged errors
     #   policy.merge(other) { |err| err[:source] = "other" }

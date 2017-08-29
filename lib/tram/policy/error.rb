@@ -6,6 +6,7 @@ class Tram::Policy
   #         from one collection of [Tram::Policy::Errors] to another.
   #
   class Error
+    # @!method self.new(value, opts)
     # Builds an error
     #
     # If another error is send to the constructor, the error returned unchanged
