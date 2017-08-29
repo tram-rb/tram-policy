@@ -1,8 +1,3 @@
-begin
-  require "pry"
-rescue
-  nil
-end
 require "bundler/setup"
 require "tram/policy"
 require "tram/policy/rspec"
