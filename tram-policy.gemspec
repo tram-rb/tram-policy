@@ -12,7 +12,7 @@ Gem::Specification.new do |gem|
   gem.extra_rdoc_files = Dir["README.md", "LICENSE", "CHANGELOG.md"]
   gem.executables      = %w[tram-policy]
 
-  gem.required_ruby_version = ">= 2.2"
+  gem.required_ruby_version = ">= 2.3"
 
   gem.add_runtime_dependency "dry-initializer", "~> 2.0"
   gem.add_runtime_dependency "i18n", "~> 0.8"
