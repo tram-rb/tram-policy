@@ -35,16 +35,26 @@ module Tram
         new(*args)
       end
 
-      private
-
+      # Translation scope for a policy
+      #
+      # @return [Array<String>]
+      #
       def scope
         @scope ||= ["tram-policy", *Inflector.underscore(name)]
       end
 
+      # List of validators defined by a policy per se
+      #
+      # @return [Array<Proc>]
+      #
       def local
         @local ||= []
       end
 
+      # List of all applicable validators from both the policy and its parent
+      #
+      # @return [Array<Proc>]
+      #
       def all
         (((self == Tram::Policy) ? [] : superclass.send(:all)) + local).uniq
       end
