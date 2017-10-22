@@ -45,13 +45,22 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
     locales.flat_map { |locale| I18n.with_locale(locale) { yield } }
   end
 
-  # Collects results for the current locale
-  def prepare_results(policy_block, tags, locale = I18n.locale)
+  def prepare_localized_results(policy_block, tags, locale)
     localized_policy = policy_block.call
     localized_errors = localized_policy&.errors || []
     self.policy      = localized_policy.inspect
     errors[locale]   = localized_errors.by_tags(tags)
     messages[locale] = localized_errors.full_messages
+  end
+
+  def prepare_results(policy_block, tags)
+    original = I18n.locale
+    I18n.available_locales.each do |locale|
+      I18n.locale = locale
+      prepare_localized_results(policy_block, tags, locale)
+    end
+  ensure
+    I18n.locale = original
   end
 
   # ****************************************************************************
@@ -88,7 +97,7 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
   # ****************************************************************************
 
   match do |policy_block|
-    in_available_locales { prepare_results(policy_block, tags) }
+    prepare_results(policy_block, tags)
     errored? && translated?
   end
 
@@ -105,7 +114,7 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
   # ****************************************************************************
 
   match_when_negated do |policy_block|
-    in_available_locales { prepare_results(policy_block, tags) }
+    prepare_results(policy_block, tags)
     not_errored?
   end
 
