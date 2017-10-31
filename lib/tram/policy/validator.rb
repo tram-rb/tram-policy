@@ -10,8 +10,6 @@ class Tram::Policy
     def check(object)
       object.__send__ :instance_variable_set, :@__scope__, scope
       name ? object.__send__(name) : object.instance_exec(&block)
-    rescue
-      object.__send__ :instance_variable_set, :@__scope__, nil
     end
 
     private
