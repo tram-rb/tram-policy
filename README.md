@@ -172,7 +172,7 @@ end
 
 Class method `.validate` supports several options:
 
-### `stop_on_faiure`
+### `stop_on_failure`
 
 If a selected validation will fail (adds an error to the collection), the following validations won't be executed.
 
