@@ -8,6 +8,9 @@ AllCops:
 Lint/AmbiguousBlockAssociation:
   Enabled: false
 
+Style/ClassAndModuleChildren:
+  Enabled: false
+
 Style/FileName:
   Exclude:
     - lib/tram-policy.rb
