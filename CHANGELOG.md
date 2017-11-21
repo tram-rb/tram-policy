@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.2.3] - WIP
+## [0.2.3] - [2017-11-21]
 
 ### Fixed
 - RSpec matcher `:be_invalid_at` checks all the available locales (nepalez)
+- Security vulnerability from old version of rubocop (update to 0.49) (nepalez)
 
 ## [0.2.2] - [2017-09-12]
 
