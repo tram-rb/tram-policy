@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.4] - [2017-12-03]
+
+Some private methods has been refactored
+
+## Internals
+- Renamed `Tram::Policy@__options__` -> `Tram::Policy##__attributes__` (nepalez)
+- Removed `Tram::Policy::Validator##scope` in favor of `Tram::Policy.scope` (nepalez)
+- Refactored spec matcher (nepalez)
+
 ## [0.2.3] - [2017-11-21]
 
 ### Fixed
