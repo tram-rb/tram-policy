@@ -10,55 +10,10 @@ module Tram
     require_relative "policy/error"
     require_relative "policy/errors"
     require_relative "policy/validator"
+    require_relative "policy/dsl"
 
     extend Dry::Initializer
-
-    class << self
-      # @!method validate(name, opts)
-      # Registers a validator
-      #
-      # @param  [#to_sym, nil] name (nil)
-      # @option opts [Boolean] :stop_on_failure
-      # @return [self]
-      #
-      def validate(name = nil, **opts, &block)
-        local << Validator.new(name, block, opts)
-        self
-      end
-
-      # Policy constructor/validator (alias for [.new])
-      #
-      # @param  [Object] *args
-      # @return [Tram::Policy]
-      #
-      def [](*args)
-        new(*args)
-      end
-
-      # Translation scope for a policy
-      #
-      # @return [Array<String>]
-      #
-      def scope
-        @scope ||= ["tram-policy", *Inflector.underscore(name)]
-      end
-
-      # List of validators defined by a policy per se
-      #
-      # @return [Array<Proc>]
-      #
-      def local
-        @local ||= []
-      end
-
-      # List of all applicable validators from both the policy and its parent
-      #
-      # @return [Array<Proc>]
-      #
-      def all
-        (((self == Tram::Policy) ? [] : superclass.send(:all)) + local).uniq
-      end
-    end
+    extend DSL
 
     # Translates a message in the scope of current policy
     #
@@ -126,7 +81,7 @@ module Tram
 
       @__options__ = self.class.dry_initializer.attributes(self)
 
-      self.class.send(:all).each do |validator|
+      self.class.validators.each do |validator|
         size = errors.count
         validator.check(self)
         break if (errors.count > size) && validator.stop_on_failure
