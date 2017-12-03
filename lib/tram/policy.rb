@@ -71,7 +71,7 @@ module Tram
     # @return [String]
     #
     def inspect
-      "#<#{self.class.name}[#{@__options__}]>"
+      "#<#{self.class.name}[#{__attributes__}]>"
     end
 
     private
@@ -79,13 +79,15 @@ module Tram
     def initialize(*)
       super
 
-      @__options__ = self.class.dry_initializer.attributes(self)
-
       self.class.validators.each do |validator|
         size = errors.count
         validator.check(self)
         break if (errors.count > size) && validator.stop_on_failure
       end
+    end
+
+    def __attributes__
+      @__attributes__ ||= self.class.dry_initializer.attributes(self)
     end
   end
 end
