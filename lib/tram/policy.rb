@@ -22,7 +22,7 @@ module Tram
       # @return [self]
       #
       def validate(name = nil, **opts, &block)
-        local << Validator.new(scope, name, block, opts)
+        local << Validator.new(name, block, opts)
         self
       end
 
@@ -66,9 +66,9 @@ module Tram
     # @param  [Hash<Symbol, Object>] options
     # @return [String]
     #
-    def t(message, options = {})
+    def t(message, **options)
       return message.to_s unless message.is_a? Symbol
-      I18n.t message, options.merge(scope: @__scope__)
+      I18n.t message, scope: self.class.scope, **options
     end
 
     # Collection of validation errors
