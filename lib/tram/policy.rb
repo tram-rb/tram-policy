@@ -23,7 +23,7 @@ module Tram
     #
     def t(message, **options)
       return message.to_s unless message.is_a? Symbol
-      I18n.t message, scope: self.class.scope, **options
+      I18n.t message, scope: self.class.send(:scope), **options
     end
 
     # Collection of validation errors
