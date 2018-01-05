@@ -15,9 +15,19 @@ class Tram::Policy
 
     def initialize(name, block, stop_on_failure: false)
       @name  = name&.to_sym
-      @block = lambda(&block) if block
+      @block = to_lambda(block)
       raise "Provide either method name or a block" unless !name ^ !block
       @stop_on_failure = stop_on_failure
+    end
+
+    def to_lambda(block)
+      return unless block
+
+      unbound = Module.new.module_exec do
+        instance_method define_method(:_, &block)
+      end
+
+      ->(&b) { unbound.bind(self == block ? block.receiver : self).call(&b) }
     end
   end
 end
