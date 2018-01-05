@@ -15,7 +15,7 @@ class Tram::Policy
 
     def initialize(name, block, stop_on_failure: false)
       @name  = name&.to_sym
-      @block = block
+      @block = lambda(&block) if block
       raise "Provide either method name or a block" unless !name ^ !block
       @stop_on_failure = stop_on_failure
     end
