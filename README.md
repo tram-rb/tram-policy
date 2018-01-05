@@ -42,7 +42,10 @@ class Article::ReadinessPolicy < Tram::Policy
   # define what methods and in what order we should use to validate an article
   validate :title_presence
   validate :subtitle_presence
-  validate { errors.add :empty, field: "text", level: "error" if text.empty? }
+  validate do # use anonymous lambda
+    return unless text.empty?
+    errors.add :empty, field: "text", level: "error"
+  end
 
   private
 
