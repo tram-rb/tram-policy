@@ -14,12 +14,12 @@ Policy Object Pattern
 
 Policy objects are responsible for context-related validation of objects, or mixes of objects. Here **context-related** means a validation doesn't check whether an object is valid by itself, but whether it is valid for some purpose (context). For example, we could ask if some article is ready (valid) to be published, etc.
 
-There are several well-known interfaces exist for validation like [ActiveModel::Validations][active-model-validation], or its [ActiveRecord][active-record-validation] extension in Rails, or PORO [Dry::Validation][dry-validation]. All of them focus on providing rich DSL-s for **validation rules**.
+There are several well-known interfaces exist for validation like [ActiveModel::Validations][active-model-validation], or its [ActiveRecord][active-record-validation] extension for Rails, or PORO [Dry::Validation][dry-validation]. All of them focus on providing rich DSL-s for **validation rules**.
 
 **Tram::Policy** follows another approach -- it uses simple Ruby methods for validation, but focuses on building both *customizable* and *composable* results of validation, namely their errors.
 
-- By **customizable** we mean adding any number of *tags* to validation error -- to allow filtering and sorting validation results.
-- By **composable** we mean a possibility to merge errors provided by one policy/validator to another, for building nested sets of well-focused policies.
+- By **customizable** we mean adding any number of *tags* to errors -- to allow filtering and sorting validation results.
+- By **composable** we mean a possibility to merge errors provided by one policy into another, and build nested sets of well-focused policies.
 
 Keeping this reasons in mind, let's go to some examples.
 
@@ -51,22 +51,24 @@ class Article::ReadinessPolicy < Tram::Policy
 
   def title_presence
     return unless title.empty?
-    # Adds an error with a message and a set of additional tags
+    # Adds an error with a unique key and a set of additional tags
     # You can use any tags, not only an attribute/field like in ActiveModel
-    errors.add "Title is empty", field: "title", level: "error"
+    errors.add :blank_title, field: "title", level: "error"
   end
 
   def subtitle_presence
     return unless subtitle.empty?
     # Notice that we can set another level
-    errors.add "Subtitle is empty", field: "subtitle", level: "warning"
+    errors.add :blank_subtitle, field: "subtitle", level: "warning"
   end
 end
 ```
 
-Because validation is the only responsibility of a policy, we don't need to call it explicitly. Policy initializer will perform all the checks immediately, memoizing the results into `errors` array. The methods `#valid?`, `#invalid?` and `#validate!` just check those `#errors`.
+Because validation is the only responsibility of a policy, we don't need to call it explicitly.
 
-You can treat an instance of policy object as immutable.
+Policy initializer will perform all the checks immediately, memoizing the results into `errors` array. The methods `#valid?`, `#invalid?` and `#validate!` just check those `#errors`.
+
+You should treat an instance immutable.
 
 ```ruby
 article = Article.new title: "A wonderful article", subtitle: "", text: ""
@@ -78,34 +80,126 @@ policy.valid?      # => false
 policy.invalid?    # => true
 policy.validate!   # raises Tram::Policy::ValidationError
 
-# Look at errors closer
+# And errors
 policy.errors.count # => 2 (no subtitle, no text)
 policy.errors.filter { |error| error.tags[:level] == "error" }.count # => 1
 policy.errors.filter { |error| error.level == "error" }.count # => 1
+```
 
-# Error messages are already added under special key :message
-policy.errors.map(&:message) # => ["Subtitle is empty", "Error translation for missed text"]
+## Validation Results
 
-# A shortcut
-policy.messages # => ["Subtitle is empty", "Error translation for missed text"]
+Let look at those errors closer. We define 3 representation of errors:
 
-# More verbose strings
-policy.full_messages
+- error objects (`policy.errors`)
+- error items (`policy.items`, `policy.errors.items`, `policy.errors.map(&:item)`)
+- error messages (`policy.messages`, `policy.errors.messages`, `policy.errors.map(&:message)`)
+
+Errors by themselves are used for composition (see the next chapter), while `items` and `messages` represent errors for translation.
+
+The difference is the following.
+
+- The `messages` are translated immediately using the current locale.
+
+- The `items` postpone translation for later (for example, you can store them in a database and translate them to the locale of UI by demand).
+
+### Items
+
+Error items contain arrays that could be send to I18n.t for translation. We add the default scope from the name of policy, preceeded by the `["tram-policy"]` root namespace.
+
+```ruby
+policy.items # or policy.errors.items, or policy.errors.map(&:item)
+# => [
+#      [
+#        :blank_title,
+#        {
+#          scope: ["tram-policy", "article/readiness_policy"]],
+#          field: "title",
+#          level: "error"
+#        }
+#      ],
+#      ...
+#    ]
+
+I18n.t(*policy.items.first)
+# => "translation missing: en.tram-policy.article/readiness_policy.blank_title"
+```
+
+You can change the root scope if you will (this could be useful in libraries):
+
+```ruby
+class MyGemPolicy < Tram::Policy
+  scope "mygem", "policies" # inherited by subclasses
+end
+
+class Article::ReadinessPolicy < MyGemPolicy
+  # ...
+end
+
+# ...
+I18n.t(*policy.items.first)
+# => "translation missing: en.mygem.policies.article/readiness_policy.blank_title"
+```
+
+### Messages
+
+Error messages contain translation of `policy.items` in the current locale:
+
+```ruby
+policy.messages # or policy.errors.messages, or policy.errors.map(&:message)
+# => [
+#      "translation missing: en.tram-policy.article/readiness_policy.blank_title",
+#      "translation missing: en.tram-policy.article/readiness_policy.blank_subtitle"
+#    ]
+```
+
+You can also use more verbose representation, which can be useful in tests:
+
+```ruby
+policy.full_messages # or policy.errors.full_messages, or policy.errors.map(&:full_message)
 # => [
 #      'Subtitle is empty: {"field":"subtitle", "level":"warning"}'
 #      'Error translation for missed text: {"field":"text", "level":"error"}'
 #    ]
+```
 
-# You can use tags in checkers -- to add condition for errors to ignore
+The messages are translated if the keys are symbolic. Strings are treated as already translated:
+
+```ruby
+class Article::ReadinessPolicy < Tram::Policy
+  # ...
+  def title_presence
+    return unless title.empty?
+    errors.add "Title is absent", field: "title", level: "error"
+  end
+end
+
+# ...
+policy.messages
+# => [
+#      "Title is absent",
+#      "translation missing: en.tram-policy.article/readiness_policy.blank_subtitle"
+#    ]
+```
+
+## Partial Validation
+
+You can use tags in checkers -- to add condition for errors to ignore
+
+```ruby
 policy.valid? { |error| !%w(warning error).include? error.level } # => false
 policy.valid? { |error| error.level != "disaster" }               # => true
+```
 
-# Notice the `invalid` takes a block with definitions for errors to count (not ignore)
+Notice the `invalid?` method takes a block with definitions for errors to count (not ignore)
+
+```ruby
 policy.invalid? { |error| %w(warning error).include? error.level } # => true
 policy.invalid? { |error| error.level == "disaster" }              # => false
 
 policy.validate! { |error| error.level != "disaster" } # => nil (seems ok)
 ```
+
+## Composition of Policies
 
 You can use errors in composition of policies:
 
@@ -134,32 +228,9 @@ class Article::PublicationPolicy < Tram::Policy
 end
 ```
 
-As mentioned above, sending a symbolic key to the `errors#add` means the key should be translated by [I18n][i18n]. The only magic under the hood concerns a scope for the translation. By default it is taken from the full name of current class prepended with `"tram-policy"`.
+## Exceptions
 
-> You can redefine the scope by reloading private method `.scope` of the policy.
-
-All tags are available as options:
-
-```ruby
-class Article::PublicationPolicy < Tram::Policy
-  # ...
-  errors.add :empty, field: "text", level: "error"
-  # ...
-end
-```
-
-```yaml
-# /config/locales/en.yml
----
-en:
-  tram-policy:
-    article/publication_policy:
-      empty: "Validation %{level}: %{field} is empty"
-```
-
-This will provide error message "Validation error: text is empty".
-
-The last thing to say is about exceptions. When you use `validate!` it raises `Tram::Policy::ValidationError` (subclass of `RuntimeError`). Its message is built from selected errors (taking into account a `validation!` filter).
+When you use `validate!` it raises `Tram::Policy::ValidationError` (subclass of `RuntimeError`). Its message is built from selected errors (taking into account a `validation!` filter).
 
 The exception also carries a backreference to the `policy` that raised it. You can use it to extract either errors, or arguments of the policy during a debugging:
 
@@ -238,7 +309,7 @@ RSpec.describe User::ReadinessPolicy do
 end
 ```
 
-**Notice** that you have to wrap policy into block `{ policy }`. This is because the matcher checks not only presence of an error, but also ensures its message is translated to all available locales (`I18n.available_locales`). The block containing a policy will be executed separately for every such language.
+**Notice** that you have to wrap policy into block `{ policy }`. This is because the matcher checks not only the presence of an error, but also ensures its message is translated to all available locales (`I18n.available_locales`). The block containing a policy will be executed separately for every such language.
 
 ## Generators
 
