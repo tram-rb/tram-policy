@@ -3,24 +3,22 @@ require "spec_helper"
 require "tram/policy/rspec"
 
 RSpec.describe <%= klass %>, ".[]" do
-  # TODO: either remove this line, or set another source for available locales
-  let(:available_locales) { I18n.available_locales }
+  subject(:policy) { described_class[<%= policy_signature %>] }
+
 <% (parsed_params + parsed_options).each do |name| -%>
   let(:<%= name %>) { FactoryGirl.build :<%= name %> }
 <% end -%>
 
-  it "is valid with proper arguments" do
-    expect { described_class[<%= policy_signature %>] }.not_to be_invalid_at
-  end
+  it { is_expected.not_to be_invalid }
 <% parsed_validators.each do |v| %>
-  # TODO: fix default description
-  it "is invalid when <%= "not " if v[:key] == v[:name] %><%= v[:key] %>" do
+  # TODO: fix context description
+  context "when <%= "not " if v[:key] == v[:name] %><%= v[:key] %>" do
     # TODO: modify some arguments
 <% (parsed_params + parsed_options).each do |name| -%>
-    <%= name %> = nil
+    let(:<%= name %>) { nil }
 <% end -%>
     # TODO: add necessary tags to focus the condition
-    expect { described_class[<%= policy_signature %>] }.to be_invalid_at
+    it { is_expected.to be_invalid_at }
   end
 <% end -%>
 end
