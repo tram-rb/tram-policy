@@ -285,123 +285,30 @@ require "tram/policy/rspec"
 ```ruby
 # spec/policies/user/readiness_policy_spec.rb
 RSpec.describe User::ReadinessPolicy do
-  let(:user) { build :user } # <- expected a factory
-
   subject(:policy) { described_class[email: "user@example.com"] }
 
-  it "is invalid with 'error' level" do
-    expect { policy }.to be_invalid_at level: "error"
-  end
+  let(:user) { build :user } # <- expected a factory
 
-  it "is not invalid with 'info' level" do
-    expect { policy }.not_to be_invalid_at level: "info"
-  end
+  it { is_expected.to be_invalid }
+  it { is_expected.to be_invalid_at level: "error" }
+  it { is_expected.to be_valid_at   level: "info" }
 end
 ```
 
-**Notice** that you have to wrap policy into block `{ policy }`. This is because the matcher checks not only the presence of an error, but also ensures its message is translated to all available locales (`I18n.available_locales`). The block containing a policy will be executed separately for every such language.
+The matcher checks not only the presence of an error, but also ensures that you provided translation of any message to any available locale (`I18n.available_locales`).
 
 ## Generators
 
-The gem provides simple tool for scaffolding new policy along with RSpec test template.
+The gem provides simple tool for scaffolding new policy along with its RSpec test template and translations.
 
 ```shell
 $ tram-policy user/readiness_policy -p user -o admin -v name_present:blank_name email_present:blank_email
 ```
 
-This will generate a policy class with specification compatible to both [RSpec][rspec] and [FactoryGirl][factory-girl]:
+This will generate a policy class with specification compatible to both [RSpec][rspec] and [FactoryBot][factory_bot].
 
-
-```ruby
-# app/policies/user/readiness_policy.rb
-
-# TODO: describe the policy, its subject and context
-class User::ReadinessPolicy < Tram::Policy
-  # TODO: add default values     (default: -> { ... }),
-  #       coercers               (type: proc(&:to_s)),
-  #       and optional arguments (optional: true)
-  #       when necessary
-  param  :user
-  option :admin
-
-  validate :name_present
-  validate :email_present
-
-  private
-
-  def name_present
-    # TODO: define a condition
-    return if true
-    # TODO: add necessary tags
-    errors.add :blank_name
-  end
-
-  def email_present
-    # TODO: define a condition
-    return if true
-    # TODO: add necessary tags
-    errors.add :blank_email
-  end
-end
-```
-
-```yaml
-# config/tram-policies.en.yml
----
-en:
-  tram-policy:
-    user/readiness_policy:
-      blank_name: translation missing
-      blank_email: translation missing
-```
-
-```ruby
-# spec/policies/user/readiness_policy_spec.rb
-require "spec_helper"
-# TODO: move it to spec_helper
-require "tram/policy/rspec"
-
-RSpec.describe User::ReadinessPolicy, ".[]" do
-  # TODO: either remove this line, or set another source for locales to check
-  let(:available_locales) { I18n.available_locales }
-  let(:user) { FactoryGirl.build :user }
-
-  it "is valid with proper arguments" do
-    expect { described_class[user] }.to be_valid
-  end
-
-  # TODO: check the description
-  it "is invalid when not name_present" do
-    # TODO: modify some arguments
-    user = nil
-    # TODO: add necessary tags to focus the condition
-    expect { described_class[user] }.to be_invalid_at
-  end
-
-  # TODO: check the description
-  it "is invalid when not email_present" do
-    # TODO: modify some arguments
-    user = nil
-    # TODO: add necessary tags to focus the condition
-    expect { described_class[user] }.to be_invalid_at
-  end
-end
-```
-
-Then you should go through all TODO-s and add necessary details.
-
-Later you can copy-paste examples to provide more edge case for testing your policies.
-
-Notice that RSpec matcher `be_invalid_at` checks at once:
-
-- that an error is added to the policy
-- that the error has given tags
-- that the error is translated to every available locale
-
-Its negation (`not_to be_invalid_at`) checks that no errors added with given tags.
-When called without tags, it checks that the policy is valid as a whole.
-
-Both matchers provide a full description for the essence of the failure.
+Under the keys `-p` and `-o` define params and options of the policy.
+Key `-v` should contain validation methods along with their error message keys.
 
 ## Installation
 
@@ -443,4 +350,4 @@ The gem is available as open source under the terms of the [MIT License](http://
 [dry-initializer]: http://dry-rb.org/gems/dry-initializer/
 [i18n]: https://github.com/svenfuchs/i18n
 [rspec]: http://rspec.info/
-[factory-girl]: https://github.com/thoughtbot/factory_girl
+[factory_bot]: https://github.com/thoughtbot/factory_bot

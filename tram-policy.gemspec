@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name     = "tram-policy"
-  gem.version  = "0.4.0"
+  gem.version  = "1.0.0"
   gem.author   = ["Viktor Sokolov (gzigzigzeo)", "Andrew Kozin (nepalez)"]
   gem.email    = "andrew.kozin@gmail.com"
   gem.homepage = "https://github.com/tram/tram-policy"
@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = ">= 2.3"
 
   gem.add_runtime_dependency "dry-initializer", "~> 2.0"
-  gem.add_runtime_dependency "i18n", "~> 0.8"
+  gem.add_runtime_dependency "i18n", "~> 1.0"
 
   gem.add_development_dependency "rake", "> 10"
   gem.add_development_dependency "rspec", "~> 3.0"

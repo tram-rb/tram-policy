@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.0] - [2018-02-17]
+
+### Changed
+- RSpec matchers does't use blocks any more (nepalez)
+
+  Instead of
+
+  ```ruby
+  expect { policy }.to be_invalid_at level: "error"
+  ```
+
+  use the simpler syntax
+
+  ```ruby
+  expect(policy).to be_invalid_at level: "error"
+  ```
+
+### Deleted
+- Deprecated methods (nepalez)
+- RSpec shared examples (nepalez)
+
 ## [0.4.0] - [2018-02-17]
 
 This is beta-release before the first stable version 1.0.0.
