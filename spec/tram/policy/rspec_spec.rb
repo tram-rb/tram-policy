@@ -57,9 +57,6 @@ RSpec.describe "RSpec support:" do
 
   describe "shared examples" do
     it_behaves_like :invalid_policy
-    it_behaves_like :invalid_policy, field: "name" do
-      before { I18n.available_locales = %i[en ru] }
-    end
-    it_behaves_like :valid_policy,   field: "email"
+    it_behaves_like :valid_policy, field: "email"
   end
 end

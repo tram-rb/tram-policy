@@ -11,7 +11,7 @@ class Tram::Policy
 
     def initialize(policy, filter)
       @policy  = policy
-      messages = policy.errors.reject(&filter).map(&:full_message)
+      messages = policy.errors.to_a.reject(&filter).map(&:message)
       super (["Validation failed with errors:"] + messages).join("\n- ")
     end
   end

@@ -15,6 +15,15 @@ module Tram
     extend Dry::Initializer
     extend DSL
 
+    # The scope used for translating error messages
+    #
+    # @return [Array<String>]
+    #
+    def scope
+      Array self.class.scope
+    end
+
+    # @!method t(message, options)
     # Translates a message in the scope of current policy
     #
     # @param  [#to_s] message
@@ -23,15 +32,31 @@ module Tram
     #
     def t(message, **options)
       return message.to_s unless message.is_a? Symbol
-      I18n.t message, scope: self.class.send(:scope), **options
+      I18n.t message, scope: scope, **options
     end
 
-    # Collection of validation errors
+    # The collection of validation errors
     #
     # @return [Tram::Policy::Errors]
     #
     def errors
       @errors ||= Errors.new(self)
+    end
+
+    # The array of error items for lazy translation
+    #
+    # @return [Array<Array>]
+    #
+    def items
+      errors.items
+    end
+
+    # The array of error messages translated for the current locale
+    #
+    # @return [Array<String>]
+    #
+    def messages
+      errors.messages
     end
 
     # Checks whether the policy is valid

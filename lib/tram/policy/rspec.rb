@@ -34,7 +34,9 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
     I18n.locale    = locale
     local_policy   = policy_block.call
     self.policy    = local_policy.inspect
-    errors[locale] = local_policy&.errors&.by_tags(tags)
+    errors[locale] = local_policy&.errors&.filter(tags)&.map do |error|
+      { message: error.message, tags: error.options } # translate immediately
+    end
   end
 
   def prepare_results(policy_block, tags)
@@ -62,7 +64,7 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
 
   # Checks if all collected errors are translated
   def translated?
-    texts = errors.values.flatten.map(&:message)
+    texts = errors.values.flatten.map { |err| err[:message] }
     texts.select { |text| text.start_with?("translation missing") }.empty?
   end
 
@@ -70,7 +72,7 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
     text = "Actual errors:\n"
     errors.each do |locale, local_errors|
       text << "  #{locale}:\n"
-      local_errors&.each { |error| text << "  - #{error.full_message}\n" }
+      local_errors&.each { |err| text << "  - #{err.values.join(" ")}\n" }
     end
     text
   end

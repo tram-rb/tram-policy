@@ -1,6 +1,8 @@
 ---
 en:
+  bad: Something bad has happened
   tram-policy:
+    bad: Something bad has happened
     test/customer_policy:
       name_presence: Name is absent
     test/user_policy:

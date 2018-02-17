@@ -22,12 +22,21 @@ class Tram::Policy
       new(*args)
     end
 
+    # Sets the root scope of the policy and its subclasses
+    #
+    # @param  [String, Array<String>] value
+    # @return [self]
+    #
+    def root_scope(*value)
+      tap { @root_scope = value.flatten.map(&:to_s).reject(&:empty?) }
+    end
+
     # Translation scope for a policy
     #
     # @return [Array<String>]
     #
     def scope
-      @scope ||= ["tram-policy", *Inflector.underscore(name)]
+      @scope ||= Array(@root_scope) + [Inflector.underscore(name)]
     end
 
     # List of validators defined by a policy per se
@@ -45,6 +54,18 @@ class Tram::Policy
     def validators
       parent_validators = self == Tram::Policy ? [] : superclass.validators
       (parent_validators + local_validators).uniq
+    end
+
+    private
+
+    def inherited(klass)
+      super
+      klass.send :instance_variable_set, :@root_scope, @root_scope
+    end
+
+    def self.extended(klass)
+      super
+      klass.send :instance_variable_set, :@root_scope, %w[tram-policy]
     end
   end
 end

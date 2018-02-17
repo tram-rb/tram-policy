@@ -1,45 +1,32 @@
 RSpec.describe Tram::Policy::Error do
-  subject(:error) { described_class.new "Something bad happened", tags }
+  subject(:error) { described_class.new :bad, options }
 
-  let(:tags) { { level: "warning" } }
+  let(:options) { { level: "warning", scope: %w[tram-policy] } }
+
+  describe "#item" do
+    subject { error.item }
+    it { is_expected.to eq [:bad, level: "warning", scope: %w[tram-policy]] }
+  end
 
   describe "#message" do
     subject { error.message }
-    it { is_expected.to eq "Something bad happened" }
-  end
-
-  describe "#full_message" do
-    subject { error.full_message }
-
-    context "with tags:" do
-      it { is_expected.to eq "Something bad happened {:level=>\"warning\"}" }
-    end
-
-    context "without tags:" do
-      let(:tags) { {} }
-      it { is_expected.to eq "Something bad happened" }
-    end
-  end
-
-  describe "#to_h" do
-    subject { error.to_h }
-    it { is_expected.to eq message: "Something bad happened", level: "warning" }
+    it { is_expected.to eq "Something bad has happened" }
   end
 
   describe "#==" do
     subject { error == other }
 
-    context "when other object has the same #to_h:" do
-      let(:other) { double to_h: error.to_h }
+    context "when other object has the same #item:" do
+      let(:other) { double to_a: error.item }
       it { is_expected.to eq true }
     end
 
-    context "when other object has different #to_h:" do
-      let(:other) { double to_h: error.to_h.merge(foo: :bar) }
+    context "when other object has different #item:" do
+      let(:other) { double to_a: [:foo] }
       it { is_expected.to eq false }
     end
 
-    context "when other object not respond to #to_h:" do
+    context "when other object not respond to #item:" do
       let(:other) { double }
       it { is_expected.to eq false }
     end

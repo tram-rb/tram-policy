@@ -6,7 +6,7 @@ class Tram::Policy
   #         from one collection of [Tram::Policy::Errors] to another.
   #
   class Error
-    # @!method self.new(value, opts)
+    # @!method self.new(value, opts = {})
     # Builds an error
     #
     # If another error is send to the constructor, the error returned unchanged
@@ -16,65 +16,108 @@ class Tram::Policy
     # @return [Tram::Policy::Error]
     #
     def self.new(value, **opts)
-      return value if value.is_a? self
-      super
+      value.instance_of?(self) ? value : super
     end
 
-    # @!attribute [r] message
-    #
-    # @return [String] The error message text
-    #
-    attr_reader :message
+    # @!attribute [r] key
+    # @return [Symbol, String] error key
+    attr_reader :key
 
+    # @!attribute [r] tags
+    # @return [Hash<Symbol, Object>] error tags
+    attr_reader :tags
+
+    # The list of arguments for [I18n.t]
+    #
+    # @return [Array]
+    #
+    def item
+      [key, tags]
+    end
+    alias to_a item
+
+    # The text of error message translated to the current locale
+    #
+    # @return [String]
+    #
+    def message
+      key.is_a?(Symbol) ? I18n.t(*item) : key.to_s
+    end
+
+    # @deprecated
+    # Converts the error to a hash of message and tags
+    #
+    # @return [Hash<Symbol, Object>]
+    #
+    def to_h
+      warn "[DEPRECATED] The method Tram::Policy::Error#to_h" \
+           " will be removed in the v1.0.0.."
+
+      tags.reject { |k| k == :scope }.merge(message: message)
+    end
+
+    # @deprecated
     # The full message (message and tags info)
     #
     # @return [String]
     #
     def full_message
-      [message, @tags].reject(&:empty?).join(" ")
+      warn "[DEPRECATED] The method Tram::Policy::Error#full_message" \
+           " will be removed in the v1.0.0."
+
+      [message, tags].reject(&:empty?).join(" ")
     end
 
-    # Converts the error to a simple hash with message and tags
-    #
-    # @return [Hash<Symbol, Object>]
-    #
-    def to_h
-      @tags.merge(message: message)
-    end
-
-    # Fetches either message or a tag
+    # Fetches an option
     #
     # @param [#to_sym] tag
     # @return [Object]
     #
     def [](tag)
-      to_h[tag.to_sym]
+      tags[tag.to_sym]
     end
 
-    # Fetches either message or a tag
+    # Fetches the tag
     #
     # @param [#to_sym] tag
     # @param [Object] default
     # @param [Proc] block
     # @return [Object]
     #
-    def fetch(tag, default, &block)
-      to_h.fetch(tag.to_sym, default, &block)
+    def fetch(tag, default = Dry::Initializer::UNDEFINED, &block)
+      if default == Dry::Initializer::UNDEFINED
+        tags.fetch(tag.to_sym, &block)
+      else
+        tags.fetch(tag.to_sym, default, &block)
+      end
     end
 
-    # Compares an error to another object using method [#to_h]
+    # Compares an error to another object using method [#item]
     #
     # @param  [Object] other Other object to compare to
     # @return [Boolean]
     #
     def ==(other)
-      other.respond_to?(:to_h) && other.to_h == to_h
+      other.respond_to?(:to_a) && other.to_a == item
+    end
+
+    # @!method contain?(some_key = nil, some_tags = {})
+    # Checks whether the error contain given key and tags
+    #
+    # @param [Object] some_key Expected key of the error
+    # @param [Hash<Symbol, Object>] some_tags Expected tags of the error
+    # @return [Boolean]
+    #
+    def contain?(some_key = nil, **some_tags)
+      return false if some_key&.!= key
+      some_tags.each { |k, v| return false unless tags[k] == v }
+      true
     end
 
     private
 
-    def initialize(message, **tags)
-      @message = message.to_s
+    def initialize(key, **tags)
+      @key  = key
       @tags = tags
     end
 
@@ -83,7 +126,7 @@ class Tram::Policy
     end
 
     def method_missing(name, *args, &block)
-      args.any? || block ? super : @tags[name]
+      args.any? || block ? super : tags[name]
     end
   end
 end

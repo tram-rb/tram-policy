@@ -15,7 +15,11 @@ RSpec.configure do |config|
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
 
-  # Prepare the Test namespace for constants defined in specs
-  config.before(:each) { Test = Class.new(Module) }
-  config.after(:each)  { Object.send :remove_const, :Test }
+  config.before(:each) do
+    Test = Class.new(Module)
+    I18n.available_locales = %w[en]
+    I18n.backend.store_translations :en, yaml_fixture_file("en.yml")["en"]
+  end
+
+  config.after(:each) { Object.send :remove_const, :Test }
 end

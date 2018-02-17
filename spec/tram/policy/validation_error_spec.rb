@@ -1,8 +1,8 @@
 RSpec.describe Tram::Policy::ValidationError do
   subject(:error) { described_class.new policy, filter }
 
-  let(:one)    { double full_message: "OMG!",  level: "error" }
-  let(:two)    { double full_message: "phew!", level: "warning" }
+  let(:one)    { double message: "OMG!",  level: "error" }
+  let(:two)    { double message: "phew!", level: "warning" }
   let(:policy) { double :policy, errors: [one, two] }
 
   shared_examples :exception_with_messages do |text|

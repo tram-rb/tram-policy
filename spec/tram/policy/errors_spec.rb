@@ -1,5 +1,5 @@
 RSpec.describe Tram::Policy::Errors do
-  let(:policy) { double :policy, t: "OMG!" }
+  let(:policy) { double :policy, scope: %w[tram-policy] }
   let(:errors) { described_class.new(policy) }
 
   describe ".new" do
@@ -12,14 +12,16 @@ RSpec.describe Tram::Policy::Errors do
   end
 
   describe "#add" do
-    subject     { errors.add :omg, level: "info", field: "name" }
+    subject { errors.add :omg, level: "info", field: "name" }
+
     let(:error) { errors.to_a.last }
 
     it "adds an error to the collection:" do
       expect { 2.times { subject } }.to change { errors.count }.by 1
 
       expect(error).to be_kind_of Tram::Policy::Error
-      expect(error).to eq message: "OMG!", level: "info", field: "name"
+      expect(error)
+        .to eq [:omg, level: "info", field: "name", scope: %w[tram-policy]]
     end
   end
 
@@ -35,6 +37,13 @@ RSpec.describe Tram::Policy::Errors do
     end
   end
 
+  describe "#items" do
+    subject { errors.items }
+
+    before { errors.add "OMG!", level: "info", field: "name" }
+    it { is_expected.to eq errors.map(&:item) }
+  end
+
   describe "#merge" do
     let(:other) { described_class.new(policy) }
 
@@ -48,9 +57,9 @@ RSpec.describe Tram::Policy::Errors do
 
       it "merges other collection as is" do
         expect(subject).to be_a Tram::Policy::Errors
-        expect(subject.map(&:to_h)).to match_array [
-          { message: "OMG!", level: "disaster" },
-          { message: "OMG!", level: "error" }
+        expect(subject.items).to match_array [
+          ["D'OH!", level: "disaster", scope: %w[tram-policy]],
+          ["OUCH!", level: "error",    scope: %w[tram-policy]]
         ]
       end
     end
@@ -60,9 +69,9 @@ RSpec.describe Tram::Policy::Errors do
 
       it "merges filtered collection as is" do
         expect(subject).to be_a Tram::Policy::Errors
-        expect(subject.map(&:to_h)).to match_array [
-          { message: "OMG!", level: "disaster" },
-          { message: "OMG!", level: "error", source: "Homer" }
+        expect(subject.items).to match_array [
+          ["D'OH!", level: "disaster", scope: %w[tram-policy]],
+          ["OUCH!", level: "error",    scope: %w[tram-policy], source: "Homer"]
         ]
       end
     end
@@ -72,9 +81,9 @@ RSpec.describe Tram::Policy::Errors do
 
       it "merges other collection with given options" do
         expect(subject).to be_a Tram::Policy::Errors
-        expect(subject.map(&:to_h)).to match_array [
-          { message: "OMG!", level: "disaster" },
-          { message: "OMG!", level: "error", source: "Homer" }
+        expect(subject.items).to match_array [
+          ["D'OH!", level: "disaster", scope: %w[tram-policy]],
+          ["OUCH!", level: "error",    scope: %w[tram-policy], source: "Homer"]
         ]
       end
     end
@@ -84,14 +93,14 @@ RSpec.describe Tram::Policy::Errors do
 
       it "merges filtered collection with given options" do
         expect(subject).to be_a Tram::Policy::Errors
-        expect(subject.map(&:to_h)).to match_array [
-          { message: "OMG!", level: "disaster" },
-          { message: "OMG!", level: "error", id: 5, age: 4 }
+        expect(subject.items).to match_array [
+          ["D'OH!", level: "disaster", scope: %w[tram-policy]],
+          ["OUCH!", level: "error",    scope: %w[tram-policy], id: 5, age: 4]
         ]
       end
     end
 
-    context "not errors:" do
+    context "with no errors:" do
       subject { errors.merge 1 }
       it { is_expected.to eql errors }
     end
@@ -100,26 +109,11 @@ RSpec.describe Tram::Policy::Errors do
   describe "#messages" do
     subject { errors.messages }
 
-    it { is_expected.to eq [] }
-
-    context "with errors added:" do
-      before  { errors.add "OMG!", level: "info", field: "name" }
-      it { is_expected.to eq %w[OMG!] }
-    end
+    before { errors.add "OMG!", level: "info", field: "name" }
+    it { is_expected.to eq errors.map(&:message) }
   end
 
-  describe "#full_messages" do
-    subject { errors.full_messages }
-
-    it { is_expected.to eq [] }
-
-    context "with errors added:" do
-      before  { errors.add "OMG!", level: "info", field: "name" }
-      it { is_expected.to eq ["OMG! {:level=>\"info\", :field=>\"name\"}"] }
-    end
-  end
-
-  describe "#by_tags" do
+  describe "#filter" do
     before do
       errors.add :foo, field: "name",  level: "error"
       errors.add :foo, field: "email", level: "info"
@@ -127,21 +121,21 @@ RSpec.describe Tram::Policy::Errors do
     end
 
     context "with filter" do
-      subject { errors.by_tags level: "error" }
+      subject { errors.filter level: "error" }
 
       it "returns selected errors only" do
-        expect(subject.map(&:to_h)).to match_array [
-          { message: "OMG!", field: "name",  level: "error" },
-          { message: "OMG!", field: "email", level: "error" }
+        expect(subject).to match_array [
+          [:foo, field: "name",  level: "error", scope: %w[tram-policy]],
+          [:foo, field: "email", level: "error", scope: %w[tram-policy]]
         ]
       end
     end
 
     context "without a filter" do
-      subject { errors.by_tags }
+      subject { errors.filter }
 
       it "returns selected all errors" do
-        expect(subject.map(&:to_h)).to match_array errors.to_a
+        expect(subject).to match_array errors.to_a
       end
     end
   end

@@ -21,12 +21,10 @@ class Tram::Policy
     # @param [Hash<Symbol, Object>] tags Tags to be attached to the message
     # @return [self] the collection
     #
-    def add(message = nil, **tags)
-      message ||= tags.delete(:message)
+    def add(message, **tags)
+      tags = tags.merge(scope: policy.scope) unless tags.key?(:scope)
       raise ArgumentError.new("Error message should be defined") unless message
-
-      @set << Tram::Policy::Error.new(@policy.t(message, tags), **tags)
-      self
+      tap { @set << Tram::Policy::Error.new(message, **tags) }
     end
 
     # Iterates by collected errors
@@ -38,15 +36,32 @@ class Tram::Policy
       @set.each { |error| yield(error) }
     end
 
-    # @!method by_tags(filter)
-    # Selects errors filtered by tags
+    # @!method filter(key = nil, tags)
+    # Filter errors by optional key and tags
     #
-    # @param  [Hash<Symbol, Object>] filter List of options to filter by
-    # @return [Hash<Symbol, Object>]
+    # @param  [#to_s] key The key to filter errors by
+    # @param  [Hash<Symbol, Object>] tags The list of tags to filter errors by
+    # @return [Tram::Policy::Errors]
     #
-    def by_tags(**filter)
-      filter = filter.to_a
-      reject { |error| (filter - error.to_h.to_a).any? }
+    def filter(key = nil, **tags)
+      list = each_with_object(Set.new) do |error, obj|
+        obj << error if error.contain?(key, tags)
+      end
+      self.class.new(policy, list)
+    end
+
+    # @deprecated
+    # @!method by_tags(tags)
+    # Selects errors filtered by key and tags
+    #
+    # @param  [Hash<Symbol, Object>] tags List of options to filter by
+    # @return [Array<Tram::Policy::Error>]
+    #
+    def by_tags(**tags)
+      warn "[DEPRECATED] The method Tram::Policy::Errors#by_tags" \
+           " will be removed in the v1.0.0. Use method #filter instead."
+
+      filter(tags).to_a
     end
 
     # @!method empty?
@@ -58,6 +73,14 @@ class Tram::Policy
       block ? !any?(&block) : !any?
     end
 
+    # The array of error items for translation
+    #
+    # @return [Array<Array>]
+    #
+    def items
+      @set.map(&:item)
+    end
+
     # The array of ordered error messages
     #
     # @return [Array<String>]
@@ -66,12 +89,16 @@ class Tram::Policy
       @set.map(&:message).sort
     end
 
-    # The array of ordered error messages with error tags info
+    # @deprecated
+    # List of error descriptions
     #
     # @return [Array<String>]
     #
     def full_messages
-      @set.map(&:full_message).sort
+      warn "[DEPRECATED] The method Tram::Policy::Errors#full_messages" \
+           " will be removed in the v1.0.0."
+
+      map(&:full_message)
     end
 
     # @!method merge(other, options)
@@ -90,8 +117,9 @@ class Tram::Policy
       return self unless other.is_a?(self.class)
 
       other.each do |err|
-        new_err = block_given? ? yield(err.to_h) : err.to_h
-        add new_err.merge(options)
+        key, opts = err.item
+        opts = yield(opts) if block_given?
+        add key, opts.merge(options)
       end
 
       self
@@ -99,9 +127,9 @@ class Tram::Policy
 
     private
 
-    def initialize(policy, errors = Set.new)
+    def initialize(policy, errors = [])
       @policy = policy
-      @set    = errors
+      @set    = Set.new(errors)
     end
   end
 end
