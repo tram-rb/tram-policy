@@ -152,16 +152,6 @@ policy.messages # or policy.errors.messages, or policy.errors.map(&:message)
 #    ]
 ```
 
-You can also use more verbose representation, which can be useful in tests:
-
-```ruby
-policy.full_messages # or policy.errors.full_messages, or policy.errors.map(&:full_message)
-# => [
-#      'Subtitle is empty: {"field":"subtitle", "level":"warning"}'
-#      'Error translation for missed text: {"field":"text", "level":"error"}'
-#    ]
-```
-
 The messages are translated if the keys are symbolic. Strings are treated as already translated:
 
 ```ruby
@@ -215,7 +205,7 @@ class Article::PublicationPolicy < Tram::Policy
 
   def article_readiness
     # Collects errors tagged by level: "error" from "nested" policy
-    readiness_errors = Article::ReadinessPolicy[article].errors.by_tags(level: "error")
+    readiness_errors = Article::ReadinessPolicy[article].errors.filter(level: "error")
 
     # Merges collected errors to the current ones.
     # New errors are also tagged by source: "readiness".
@@ -412,43 +402,6 @@ Its negation (`not_to be_invalid_at`) checks that no errors added with given tag
 When called without tags, it checks that the policy is valid as a whole.
 
 Both matchers provide a full description for the essence of the failure.
-
-## To Recap
-
-The `Tram::Policy` DSL provides the following methods:
-
-* `.param` and `.option` - class-level methods for policy constructor arguments
-* `.validate` - class-level method to add validators (they will be invoked in the same order as defined)
-* `.[]` - a syntax sugar for `.new`
-
-* `#errors` - returns an enumerable collection of validation errors
-* `#valid?` - checks whether no errors exist
-* `#invalid?` - checks whether some error exists
-* `#validate!` - raises if some error exist
-
-Enumerable collection of unique policy `errors` (`Tram::Policy::Errors`) responds to methods:
-
-* `add` - adds an error to the collection
-* `each` - iterates by the set of errors (support other methods of enumerables)
-* `empty?` - checks whether a collection is emtpy (in addition to enumerable interface)
-* `by_tags` - filters errors that have given tags
-* `messages` - returns an array of messages
-* `full_messages` - returns an array of messages with tags info added (used in exception)
-* `merge` - merges a collection to another one
-
-Every instance of `Tram::Policy::Error` supports:
-
-* `#tags` - hash of assigned tags
-* `#message` - the translated message
-* `#full_message` - the message with tags info added
-* `#to_h` - hash of tags and a message
-* `#==` - checks whether an error is equal to another one
-* undefined methods treated as tags
-
-The instance of `Tram::Policy::ValidationError` responds to:
-
-* `policy` - returns a policy object that raised an exception
-* other methods defined by the `RuntimeError` class
 
 ## Installation
 

@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.4.0] - [2018-02-17]
+
+This is beta-release before the first stable version 1.0.0.
+
+It adds methods `#item` and `#items` to policy errors to support lazy translation.
+
+It also renames some methods, and deprecate others that will be removed from v1.0.0.
+
+### Added
+- `Tram::Policy.root_scope` changes the default root scope ("tram-policy") for I18n (nepalez)
+- `Tram::Policy::Error#item` returns an array of [key, tags] which can be sent to I18n.t later (nepalez)
+- `Tram::Policy::Error#to_a` as an alias for the `#item` (nepalez)
+- `Tram::Policy::Errors#items` returns an array of error items (nepalez)
+- `Tram::Policy::Errors#filter` acts like `by_tag` but returns the filtered collection instead of an array (nepalez)
+- `Tram::Policy#messages` as a shortcut for `errors.messages` (nepalez)
+- `Tram::Policy#items` as a shortcut for `errors.items` (nepalez)
+
+### Changed
+- errors are compared by `#to_a` instead of `#to_h` (nepalez)
+
+### Deprecated
+- `Tram::Policy::Error#full_message` (nepalez)
+- `Tram::Policy::Error#to_h` (nepalez)
+- `Tram::Policy::Errors#full_messages` (nepalez)
+- `Tram::Policy::Errors#by_tags` (nepalez)
+
 ## [0.3.1] - [2018-01-05]
 
 ### Fixed
@@ -114,7 +140,7 @@ The gem is battle-tested for production (in a real commertial project).
 
   Use a multiline version instead of `validate :foo, :bar`:
 
-  ```
+  ```ruby
   validate :foo
   validate :bar
   ```
@@ -143,3 +169,4 @@ This is a first public release (@nepalez, @charlie-wasp, @JewelSam, @sergey-chec
 [0.2.5]: https://github.com/tram-rb/tram-policy/compare/v0.2.4...v0.2.5
 [0.3.0]: https://github.com/tram-rb/tram-policy/compare/v0.2.5...v0.3.0
 [0.3.1]: https://github.com/tram-rb/tram-policy/compare/v0.3.0...v0.3.1
+[0.4.0]: https://github.com/tram-rb/tram-policy/compare/v0.3.1...v0.4.0
