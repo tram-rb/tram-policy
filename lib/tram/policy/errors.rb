@@ -50,20 +50,6 @@ class Tram::Policy
       self.class.new(policy, list)
     end
 
-    # @deprecated
-    # @!method by_tags(tags)
-    # Selects errors filtered by key and tags
-    #
-    # @param  [Hash<Symbol, Object>] tags List of options to filter by
-    # @return [Array<Tram::Policy::Error>]
-    #
-    def by_tags(**tags)
-      warn "[DEPRECATED] The method Tram::Policy::Errors#by_tags" \
-           " will be removed in the v1.0.0. Use method #filter instead."
-
-      filter(tags).to_a
-    end
-
     # @!method empty?
     # Checks whether a collection is empty
     #
@@ -87,18 +73,6 @@ class Tram::Policy
     #
     def messages
       @set.map(&:message).sort
-    end
-
-    # @deprecated
-    # List of error descriptions
-    #
-    # @return [Array<String>]
-    #
-    def full_messages
-      warn "[DEPRECATED] The method Tram::Policy::Errors#full_messages" \
-           " will be removed in the v1.0.0."
-
-      map(&:full_message)
     end
 
     # @!method merge(other, options)

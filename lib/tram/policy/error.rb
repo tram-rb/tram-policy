@@ -44,30 +44,6 @@ class Tram::Policy
       key.is_a?(Symbol) ? I18n.t(*item) : key.to_s
     end
 
-    # @deprecated
-    # Converts the error to a hash of message and tags
-    #
-    # @return [Hash<Symbol, Object>]
-    #
-    def to_h
-      warn "[DEPRECATED] The method Tram::Policy::Error#to_h" \
-           " will be removed in the v1.0.0.."
-
-      tags.reject { |k| k == :scope }.merge(message: message)
-    end
-
-    # @deprecated
-    # The full message (message and tags info)
-    #
-    # @return [String]
-    #
-    def full_message
-      warn "[DEPRECATED] The method Tram::Policy::Error#full_message" \
-           " will be removed in the v1.0.0."
-
-      [message, tags].reject(&:empty?).join(" ")
-    end
-
     # Fetches an option
     #
     # @param [#to_sym] tag
