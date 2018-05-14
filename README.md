@@ -128,7 +128,7 @@ You can change the root scope if you will (this could be useful in libraries):
 
 ```ruby
 class MyGemPolicy < Tram::Policy
-  scope "mygem", "policies" # inherited by subclasses
+  root_scope "mygem", "policies" # inherited by subclasses
 end
 
 class Article::ReadinessPolicy < MyGemPolicy
