@@ -17,8 +17,11 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
 
   def missed_translations
     @missed_translations ||= \
-      errors.flat_map { |rec| rec.values_at(*locales) }
-            .select { |message| message.start_with? "translation missing" }
+      errors
+        .flat_map { |rec| rec.values_at(*locales) }
+        .select do |message|
+          message.is_a?(String) && message.start_with?("translation missing")
+        end
   end
 
   def report_errors
