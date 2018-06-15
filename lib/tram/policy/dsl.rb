@@ -31,12 +31,21 @@ class Tram::Policy
       tap { @root_scope = value.flatten.map(&:to_s).reject(&:empty?) }
     end
 
+    # Sets the scope leaf key of the policy (it won't be inherited by subclasses)
+    #
+    # @param  [String] value
+    # @return [self]
+    #
+    def scope_leaf_key(value)
+      tap { @scope_leaf_key = value&.to_s }
+    end
+
     # Translation scope for a policy
     #
     # @return [Array<String>]
     #
     def scope
-      @scope ||= Array(@root_scope) + [Inflector.underscore(name)]
+      @scope ||= Array(@root_scope) + [@scope_leaf_key || Inflector.underscore(name)]
     end
 
     # List of validators defined by a policy per se

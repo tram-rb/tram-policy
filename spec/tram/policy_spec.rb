@@ -174,4 +174,35 @@ RSpec.describe Tram::Policy do
       it { is_expected.to eq "error: Name is absent" }
     end
   end
+
+  describe "#scope" do
+    subject { policy.scope }
+
+    context "without any scope settings" do
+      it { is_expected.to eq %w[tram-policy test/user_policy] }
+    end
+
+    context "when root scope is specified" do
+      subject do
+        class Test::SomePolicy < described_class
+          root_scope :test_scope
+        end
+        Test::SomePolicy[user].scope
+      end
+
+      it { is_expected.to eq %w[test_scope test/some_policy] }
+    end
+
+    context "when both root scope and scope leaf key are specified" do
+      subject do
+        class Test::SomePolicy < described_class
+          root_scope :test_scope
+          scope_leaf_key :arbitrary_string
+        end
+        Test::SomePolicy[user].scope
+      end
+
+      it { is_expected.to eq %w[test_scope arbitrary_string] }
+    end
+  end
 end
