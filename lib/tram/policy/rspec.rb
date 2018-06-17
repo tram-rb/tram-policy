@@ -60,10 +60,12 @@ end
 
 RSpec::Matchers.define :be_invalid do
   match do |policy|
+    return expect(policy.valid?).to(be_falsey) unless policy.is_a?(Tram::Policy)
     expect(policy).to be_invalid_at
   end
 
   match_when_negated do |policy|
+    return expect(policy.valid?).to(be_truthy) unless policy.is_a?(Tram::Policy)
     expect(policy).not_to be_invalid_at
   end
 end

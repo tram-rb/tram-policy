@@ -46,4 +46,19 @@ RSpec.describe "RSpec support:" do
         .to raise_error RSpec::Expectations::ExpectationNotMetError
     end
   end
+
+  describe "to be_invalid" do
+    subject { double("model") }
+
+    it "fails with valid non-policy object" do
+      allow(subject).to receive(:valid?).and_return(true)
+      expect { expect(subject).to be_invalid }
+        .to raise_error RSpec::Expectations::ExpectationNotMetError
+    end
+
+    it "passes with invalid non-policy object" do
+      allow(subject).to receive(:valid?).and_return(false)
+      expect { expect(subject).to be_invalid }.not_to raise_error
+    end
+  end
 end
