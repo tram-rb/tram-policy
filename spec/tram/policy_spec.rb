@@ -197,7 +197,7 @@ RSpec.describe Tram::Policy do
       subject do
         class Test::SomePolicy < described_class
           root_scope :test_scope
-          scope_leaf_key :arbitrary_string
+          leaf_scope :arbitrary_string
         end
         Test::SomePolicy[user].scope
       end

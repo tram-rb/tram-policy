@@ -36,8 +36,8 @@ class Tram::Policy
     # @param  [String] value
     # @return [self]
     #
-    def scope_leaf_key(value)
-      tap { @scope_leaf_key = value&.to_s }
+    def leaf_scope(value)
+      tap { @leaf_scope = value&.to_s }
     end
 
     # Translation scope for a policy
@@ -45,7 +45,7 @@ class Tram::Policy
     # @return [Array<String>]
     #
     def scope
-      @scope ||= Array(@root_scope) + [@scope_leaf_key || Inflector.underscore(name)]
+      @scope ||= Array(@root_scope) + [@leaf_scope || Inflector.underscore(name)]
     end
 
     # List of validators defined by a policy per se
