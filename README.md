@@ -7,7 +7,6 @@ Policy Object Pattern
 
 [![Gem Version][gem-badger]][gem]
 [![Build Status][travis-badger]][travis]
-[![Dependency Status][gemnasium-badger]][gemnasium]
 [![Inline docs][inch-badger]][inch]
 
 ## Intro
@@ -338,8 +337,6 @@ The gem is available as open source under the terms of the [MIT License](http://
 [codeclimate]: https://codeclimate.com/github/tram-rb/tram-policy
 [gem-badger]: https://img.shields.io/gem/v/tram-policy.svg?style=flat
 [gem]: https://rubygems.org/gems/tram-policy
-[gemnasium-badger]: https://img.shields.io/gemnasium/tram-rb/tram-policy.svg?style=flat
-[gemnasium]: https://gemnasium.com/tram-rb/tram-policy
 [inch-badger]: http://inch-ci.org/github/tram-rb/tram-policy.svg
 [inch]: https://inch-ci.org/github/tram-rb/tram-policy
 [travis-badger]: https://img.shields.io/travis/tram-rb/tram-policy/master.svg?style=flat

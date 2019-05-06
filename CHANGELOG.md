@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.1] - [2019-05-06]
+
+### Added
+- Support of `dry-initializer` v3.0+ (nepalez)
+
+### Fixed
+- Fix be_invalid RSpec matcher if non-policy model is passed (Envek)
+- Disable translation check for non-strings in rspec matcher (Envek)
+
 ## [1.0.0] - [2018-02-17]
 
 ### Changed
@@ -191,3 +200,5 @@ This is a first public release (@nepalez, @charlie-wasp, @JewelSam, @sergey-chec
 [0.3.0]: https://github.com/tram-rb/tram-policy/compare/v0.2.5...v0.3.0
 [0.3.1]: https://github.com/tram-rb/tram-policy/compare/v0.3.0...v0.3.1
 [0.4.0]: https://github.com/tram-rb/tram-policy/compare/v0.3.1...v0.4.0
+[1.0.0]: https://github.com/tram-rb/tram-policy/compare/v0.4.0...v1.0.0
+[1.0.1]: https://github.com/tram-rb/tram-policy/compare/v1.0.0...v1.0.1
