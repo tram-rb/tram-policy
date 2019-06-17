@@ -1,4 +1,5 @@
 class Tram::Policy
+  #
   # Enumerable collection of unique unordered validation errors
   #
   # Notice: A collection is context-dependent;
@@ -8,11 +9,9 @@ class Tram::Policy
   class Errors
     include Enumerable
 
-    # @!attribute [r] policy
-    #
-    # @return [Tram::Policy] the poplicy errors provided by
-    #
-    attr_reader :policy
+    # @!attribute [r] scope
+    # @return [Array<String>] the scope for error messages' translation
+    attr_reader :scope
 
     # @!method add(message, tags)
     # Adds error message to the collection
@@ -22,9 +21,9 @@ class Tram::Policy
     # @return [self] the collection
     #
     def add(message, **tags)
-      tags = tags.merge(scope: policy.scope) unless tags.key?(:scope)
       raise ArgumentError.new("Error message should be defined") unless message
-      tap { @set << Tram::Policy::Error.new(message, **tags) }
+
+      tap { @set << Tram::Policy::Error.new(message, scope, **tags) }
     end
 
     # Iterates by collected errors
@@ -47,7 +46,7 @@ class Tram::Policy
       list = each_with_object(Set.new) do |error, obj|
         obj << error if error.contain?(key, tags)
       end
-      self.class.new(policy, list)
+      self.class.new(scope: scope, errors: list)
     end
 
     # @!method empty?
@@ -101,9 +100,9 @@ class Tram::Policy
 
     private
 
-    def initialize(policy, errors = [])
-      @policy = policy
-      @set    = Set.new(errors)
+    def initialize(**options)
+      @scope = options[:scope] || Error::DEFAULT_SCOPE
+      @set   = Set.new options[:errors].to_a
     end
   end
 end

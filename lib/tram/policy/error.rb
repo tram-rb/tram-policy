@@ -15,7 +15,7 @@ class Tram::Policy
     # @param  [Hash<Symbol, Object>] opts
     # @return [Tram::Policy::Error]
     #
-    def self.new(value, **opts)
+    def self.new(value, scope, **opts)
       value.instance_of?(self) ? value : super
     end
 
@@ -27,16 +27,20 @@ class Tram::Policy
     # @return [Hash<Symbol, Object>] error tags
     attr_reader :tags
 
-    # The list of arguments for [I18n.t]
+    # @!attribute [r] scope
+    # @return [Array<String>] scope for error message translation
+    attr_reader :scope
+
+    # List of arguments for [I18n.t]
     #
     # @return [Array]
     #
     def item
-      [key, tags]
+      [key, tags.merge(scope: scope)]
     end
     alias to_a item
 
-    # The text of error message translated to the current locale
+    # Text of error message translated to the current locale
     #
     # @return [String]
     #
@@ -60,8 +64,8 @@ class Tram::Policy
     # @param [Proc] block
     # @return [Object]
     #
-    def fetch(tag, default = Dry::Initializer::UNDEFINED, &block)
-      if default == Dry::Initializer::UNDEFINED
+    def fetch(tag, default = UNDEFINED, &block)
+      if default == UNDEFINED
         tags.fetch(tag.to_sym, &block)
       else
         tags.fetch(tag.to_sym, default, &block)
@@ -92,9 +96,13 @@ class Tram::Policy
 
     private
 
-    def initialize(key, **tags)
-      @key  = key
-      @tags = tags
+    UNDEFINED = Dry::Initializer::UNDEFINED
+    DEFAULT_SCOPE = %w[tram-policy errors].freeze
+
+    def initialize(key, scope, **tags)
+      @key   = key
+      @tags  = tags
+      @scope = scope || DEFAULT_SCOPE
     end
 
     def respond_to_missing?(*)

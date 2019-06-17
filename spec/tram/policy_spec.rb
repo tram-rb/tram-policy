@@ -63,8 +63,8 @@ RSpec.describe Tram::Policy do
   describe "#errors" do
     subject { policy.errors }
 
-    its(:class)  { is_expected.to eq Tram::Policy::Errors }
-    its(:policy) { is_expected.to eql policy }
+    its(:class) { is_expected.to eq Tram::Policy::Errors }
+    its(:scope) { is_expected.to eql policy.scope }
   end
 
   describe "#valid?" do
