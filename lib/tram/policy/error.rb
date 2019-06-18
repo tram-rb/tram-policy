@@ -98,7 +98,7 @@ class Tram::Policy
     def initialize(key, **tags)
       @key  = key
       @tags = tags
-      @tags[:scope] ||= DEFAULT_SCOPE if key.is_a?(Symbol)
+      @tags[:scope] = @tags.fetch(:scope) { DEFAULT_SCOPE } if key.is_a?(Symbol)
     end
 
     def respond_to_missing?(*)
