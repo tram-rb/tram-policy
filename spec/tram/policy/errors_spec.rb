@@ -48,8 +48,8 @@ RSpec.describe Tram::Policy::Errors do
     let(:other) { described_class.new(scope: scope) }
 
     before do
-      errors.add "D'OH!", level: "disaster"
-      other.add  "OUCH!", level: "error"
+      errors.add :"D'OH!", level: "disaster"
+      other.add  "OUCH!",  level: "error"
     end
 
     context "without a block:" do
@@ -58,8 +58,8 @@ RSpec.describe Tram::Policy::Errors do
       it "merges other collection as is" do
         expect(subject).to be_a Tram::Policy::Errors
         expect(subject.items).to match_array [
-          ["D'OH!", level: "disaster", scope: scope],
-          ["OUCH!", level: "error",    scope: scope]
+          [:"D'OH!", level: "disaster", scope: scope],
+          ["OUCH!", level: "error"]
         ]
       end
     end
@@ -70,8 +70,8 @@ RSpec.describe Tram::Policy::Errors do
       it "merges filtered collection as is" do
         expect(subject).to be_a Tram::Policy::Errors
         expect(subject.items).to match_array [
-          ["D'OH!", level: "disaster", scope: scope],
-          ["OUCH!", level: "error",    scope: scope, source: "Homer"]
+          [:"D'OH!", level: "disaster", scope: scope],
+          ["OUCH!", level: "error", source: "Homer"]
         ]
       end
     end
@@ -82,8 +82,8 @@ RSpec.describe Tram::Policy::Errors do
       it "merges other collection with given options" do
         expect(subject).to be_a Tram::Policy::Errors
         expect(subject.items).to match_array [
-          ["D'OH!", level: "disaster", scope: scope],
-          ["OUCH!", level: "error",    scope: scope, source: "Homer"]
+          [:"D'OH!", level: "disaster", scope: scope],
+          ["OUCH!", level: "error", source: "Homer"]
         ]
       end
     end
@@ -94,8 +94,8 @@ RSpec.describe Tram::Policy::Errors do
       it "merges filtered collection with given options" do
         expect(subject).to be_a Tram::Policy::Errors
         expect(subject.items).to match_array [
-          ["D'OH!", level: "disaster", scope: scope],
-          ["OUCH!", level: "error",    scope: scope, id: 5, age: 4]
+          [:"D'OH!", level: "disaster", scope: scope],
+          ["OUCH!", level: "error", id: 5, age: 4]
         ]
       end
     end

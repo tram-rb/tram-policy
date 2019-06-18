@@ -12,10 +12,10 @@ class Tram::Policy
     # If another error is send to the constructor, the error returned unchanged
     #
     # @param  [Tram::Policy::Error, #to_s] value
-    # @param  [Hash<Symbol, Object>] opts
+    # @param  [Hash<Symbol, Object>] tags
     # @return [Tram::Policy::Error]
     #
-    def self.new(value, scope, **opts)
+    def self.new(value, **tags)
       value.instance_of?(self) ? value : super
     end
 
@@ -27,16 +27,12 @@ class Tram::Policy
     # @return [Hash<Symbol, Object>] error tags
     attr_reader :tags
 
-    # @!attribute [r] scope
-    # @return [Array<String>] scope for error message translation
-    attr_reader :scope
-
     # List of arguments for [I18n.t]
     #
     # @return [Array]
     #
     def item
-      [key, tags.merge(scope: scope)]
+      [key, tags]
     end
     alias to_a item
 
@@ -99,10 +95,10 @@ class Tram::Policy
     UNDEFINED = Dry::Initializer::UNDEFINED
     DEFAULT_SCOPE = %w[tram-policy errors].freeze
 
-    def initialize(key, scope, **tags)
-      @key   = key
-      @tags  = tags
-      @scope = scope || DEFAULT_SCOPE
+    def initialize(key, **tags)
+      @key  = key
+      @tags = tags
+      @tags[:scope] ||= DEFAULT_SCOPE if key.is_a?(Symbol)
     end
 
     def respond_to_missing?(*)
