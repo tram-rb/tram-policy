@@ -1,6 +1,6 @@
 RSpec.describe Tram::Policy::Errors do
-  let(:policy) { double :policy, scope: %w[tram-policy] }
-  let(:errors) { described_class.new(policy) }
+  let(:scope)  { %w[tram-policy] }
+  let(:errors) { described_class.new(scope: scope) }
 
   describe ".new" do
     subject { errors }
@@ -8,7 +8,7 @@ RSpec.describe Tram::Policy::Errors do
     it { is_expected.to be_kind_of Enumerable }
     it { is_expected.to respond_to :empty? }
     it { is_expected.to be_empty }
-    its(:policy) { is_expected.to eql policy }
+    its(:scope) { is_expected.to eql scope }
   end
 
   describe "#add" do
@@ -21,7 +21,7 @@ RSpec.describe Tram::Policy::Errors do
 
       expect(error).to be_kind_of Tram::Policy::Error
       expect(error)
-        .to eq [:omg, level: "info", field: "name", scope: %w[tram-policy]]
+        .to eq [:omg, level: "info", field: "name", scope: scope]
     end
   end
 
@@ -45,11 +45,11 @@ RSpec.describe Tram::Policy::Errors do
   end
 
   describe "#merge" do
-    let(:other) { described_class.new(policy) }
+    let(:other) { described_class.new(scope: scope) }
 
     before do
-      errors.add "D'OH!", level: "disaster"
-      other.add  "OUCH!", level: "error"
+      errors.add :"D'OH!", level: "disaster"
+      other.add  "OUCH!",  level: "error"
     end
 
     context "without a block:" do
@@ -58,8 +58,8 @@ RSpec.describe Tram::Policy::Errors do
       it "merges other collection as is" do
         expect(subject).to be_a Tram::Policy::Errors
         expect(subject.items).to match_array [
-          ["D'OH!", level: "disaster", scope: %w[tram-policy]],
-          ["OUCH!", level: "error",    scope: %w[tram-policy]]
+          [:"D'OH!", level: "disaster", scope: scope],
+          ["OUCH!", level: "error"]
         ]
       end
     end
@@ -70,8 +70,8 @@ RSpec.describe Tram::Policy::Errors do
       it "merges filtered collection as is" do
         expect(subject).to be_a Tram::Policy::Errors
         expect(subject.items).to match_array [
-          ["D'OH!", level: "disaster", scope: %w[tram-policy]],
-          ["OUCH!", level: "error",    scope: %w[tram-policy], source: "Homer"]
+          [:"D'OH!", level: "disaster", scope: scope],
+          ["OUCH!", level: "error", source: "Homer"]
         ]
       end
     end
@@ -82,8 +82,8 @@ RSpec.describe Tram::Policy::Errors do
       it "merges other collection with given options" do
         expect(subject).to be_a Tram::Policy::Errors
         expect(subject.items).to match_array [
-          ["D'OH!", level: "disaster", scope: %w[tram-policy]],
-          ["OUCH!", level: "error",    scope: %w[tram-policy], source: "Homer"]
+          [:"D'OH!", level: "disaster", scope: scope],
+          ["OUCH!", level: "error", source: "Homer"]
         ]
       end
     end
@@ -94,8 +94,8 @@ RSpec.describe Tram::Policy::Errors do
       it "merges filtered collection with given options" do
         expect(subject).to be_a Tram::Policy::Errors
         expect(subject.items).to match_array [
-          ["D'OH!", level: "disaster", scope: %w[tram-policy]],
-          ["OUCH!", level: "error",    scope: %w[tram-policy], id: 5, age: 4]
+          [:"D'OH!", level: "disaster", scope: scope],
+          ["OUCH!", level: "error", id: 5, age: 4]
         ]
       end
     end
@@ -125,8 +125,8 @@ RSpec.describe Tram::Policy::Errors do
 
       it "returns selected errors only" do
         expect(subject).to match_array [
-          [:foo, field: "name",  level: "error", scope: %w[tram-policy]],
-          [:foo, field: "email", level: "error", scope: %w[tram-policy]]
+          [:foo, field: "name",  level: "error", scope: scope],
+          [:foo, field: "email", level: "error", scope: scope]
         ]
       end
     end

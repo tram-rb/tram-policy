@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0] - To be released
+
+### Changed
+
+- [BREAKING] undinging `Tram::Policy::Errors` from a policy (nepalez)
+  
+  Instead of the policy, the collection refers to the explicit scope used for error messages' translation.
+  This change breaks the signature of `Tram::Policy::Error` and `Tram::Policy::Errors`.
+
 ## [1.0.1] - [2019-05-06]
 
 ### Added

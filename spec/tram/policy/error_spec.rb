@@ -1,11 +1,12 @@
 RSpec.describe Tram::Policy::Error do
   subject(:error) { described_class.new :bad, options }
 
-  let(:options) { { level: "warning", scope: %w[tram-policy] } }
+  let(:scope)   { %w[tram-policy] }
+  let(:options) { { level: "warning", scope: scope } }
 
   describe "#item" do
     subject { error.item }
-    it { is_expected.to eq [:bad, level: "warning", scope: %w[tram-policy]] }
+    it { is_expected.to eq [:bad, level: "warning", scope: scope] }
   end
 
   describe "#message" do

@@ -40,7 +40,7 @@ module Tram
     # @return [Tram::Policy::Errors]
     #
     def errors
-      @errors ||= Errors.new(self)
+      @errors ||= Errors.new(scope: scope)
     end
 
     # The array of error items for lazy translation

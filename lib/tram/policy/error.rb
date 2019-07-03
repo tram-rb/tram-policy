@@ -12,10 +12,10 @@ class Tram::Policy
     # If another error is send to the constructor, the error returned unchanged
     #
     # @param  [Tram::Policy::Error, #to_s] value
-    # @param  [Hash<Symbol, Object>] opts
+    # @param  [Hash<Symbol, Object>] tags
     # @return [Tram::Policy::Error]
     #
-    def self.new(value, **opts)
+    def self.new(value, **tags)
       value.instance_of?(self) ? value : super
     end
 
@@ -27,7 +27,7 @@ class Tram::Policy
     # @return [Hash<Symbol, Object>] error tags
     attr_reader :tags
 
-    # The list of arguments for [I18n.t]
+    # List of arguments for [I18n.t]
     #
     # @return [Array]
     #
@@ -36,7 +36,7 @@ class Tram::Policy
     end
     alias to_a item
 
-    # The text of error message translated to the current locale
+    # Text of error message translated to the current locale
     #
     # @return [String]
     #
@@ -60,8 +60,8 @@ class Tram::Policy
     # @param [Proc] block
     # @return [Object]
     #
-    def fetch(tag, default = Dry::Initializer::UNDEFINED, &block)
-      if default == Dry::Initializer::UNDEFINED
+    def fetch(tag, default = UNDEFINED, &block)
+      if default == UNDEFINED
         tags.fetch(tag.to_sym, &block)
       else
         tags.fetch(tag.to_sym, default, &block)
@@ -92,9 +92,13 @@ class Tram::Policy
 
     private
 
+    UNDEFINED = Dry::Initializer::UNDEFINED
+    DEFAULT_SCOPE = %w[tram-policy errors].freeze
+
     def initialize(key, **tags)
       @key  = key
       @tags = tags
+      @tags[:scope] = @tags.fetch(:scope) { DEFAULT_SCOPE } if key.is_a?(Symbol)
     end
 
     def respond_to_missing?(*)
