@@ -4,11 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.0.0] - To be released
+## [2.0.0] - [2019-07-04]
 
 ### Changed
 
-- [BREAKING] undinging `Tram::Policy::Errors` from a policy (nepalez)
+- [BREAKING] separate `Tram::Policy::Errors` from a policy (nepalez, sclinede)
   
   Instead of the policy, the collection refers to the explicit scope used for error messages' translation.
   This change breaks the signature of `Tram::Policy::Error` and `Tram::Policy::Errors`.
@@ -211,3 +211,4 @@ This is a first public release (@nepalez, @charlie-wasp, @JewelSam, @sergey-chec
 [0.4.0]: https://github.com/tram-rb/tram-policy/compare/v0.3.1...v0.4.0
 [1.0.0]: https://github.com/tram-rb/tram-policy/compare/v0.4.0...v1.0.0
 [1.0.1]: https://github.com/tram-rb/tram-policy/compare/v1.0.0...v1.0.1
+[2.0.0]: https://github.com/tram-rb/tram-policy/compare/v1.0.1...v2.0.0
