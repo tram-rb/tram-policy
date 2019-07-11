@@ -24,7 +24,7 @@ class Tram::Policy
       raise ArgumentError.new("Error message should be defined") unless message
 
       tap do
-        tags = tags.merge(scope: scope) if message.is_a?(Symbol)
+        tags = { scope: scope }.merge(tags) if message.is_a?(Symbol)
         @set << Tram::Policy::Error.new(message, **tags)
       end
     end
