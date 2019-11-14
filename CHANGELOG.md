@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.1] - [2019-11-14]
+
+### Fixed
+- Allow translation :scope to be customized in the #merge operation (sclinede)
+  Before the fix, the customized value was always replaced by the default value.
+
 ## [2.0.0] - [2019-07-04]
 
 ### Changed
