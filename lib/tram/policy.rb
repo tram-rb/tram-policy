@@ -101,7 +101,7 @@ module Tram
 
     private
 
-    def initialize(*args, **kwargs)
+    def initialize(*, **)
       super
 
       self.class.validators.each do |validator|
