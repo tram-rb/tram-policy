@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.0] - [2021-11-30]
+
+### Fixed
+- Difference between last positional and keyword arguments in Ruby 3.0+ (mrexox)
+
 ## [2.0.1] - [2019-11-14]
 
 ### Fixed
@@ -218,3 +223,5 @@ This is a first public release (@nepalez, @charlie-wasp, @JewelSam, @sergey-chec
 [1.0.0]: https://github.com/tram-rb/tram-policy/compare/v0.4.0...v1.0.0
 [1.0.1]: https://github.com/tram-rb/tram-policy/compare/v1.0.0...v1.0.1
 [2.0.0]: https://github.com/tram-rb/tram-policy/compare/v1.0.1...v2.0.0
+[2.0.1]: https://github.com/tram-rb/tram-policy/compare/v2.0.0...v2.0.1
+[2.1.0]: https://github.com/tram-rb/tram-policy/compare/v2.0.1...v2.1.0
