@@ -105,8 +105,8 @@ class Tram::Policy
       true
     end
 
-    def method_missing(name, *args, &block)
-      args.any? || block ? super : tags[name]
+    def method_missing(name, *args, **kwargs, &block)
+      args.any? || kwargs.any? || block ? super : tags[name]
     end
   end
 end

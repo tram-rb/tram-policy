@@ -3,7 +3,7 @@ Gem::Specification.new do |gem|
   gem.version  = "2.0.1"
   gem.author   = ["Viktor Sokolov (gzigzigzeo)", "Andrew Kozin (nepalez)"]
   gem.email    = "andrew.kozin@gmail.com"
-  gem.homepage = "https://github.com/tram/tram-policy"
+  gem.homepage = "https://github.com/tram-rb/tram-policy"
   gem.summary  = "Policy Object Pattern"
   gem.license  = "MIT"
 

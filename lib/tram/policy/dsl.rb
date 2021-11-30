@@ -18,8 +18,8 @@ class Tram::Policy
     # @param  [Object] *args
     # @return [Tram::Policy]
     #
-    def [](*args)
-      new(*args)
+    def [](*args, **kwargs)
+      new(*args, **kwargs)
     end
 
     # Sets the root scope of the policy and its subclasses
