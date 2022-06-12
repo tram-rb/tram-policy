@@ -47,7 +47,7 @@ class Tram::Policy
     #
     def filter(key = nil, **tags)
       list = each_with_object(Set.new) do |error, obj|
-        obj << error if error.contain?(key, tags)
+        obj << error if error.contain?(key, **tags)
       end
       self.class.new(scope: scope, errors: list)
     end
@@ -95,7 +95,7 @@ class Tram::Policy
       other.each do |err|
         key, opts = err.item
         opts = yield(opts) if block_given?
-        add key, opts.merge(options)
+        add key, **opts.merge(options)
       end
 
       self

@@ -9,7 +9,7 @@ class Tram::Policy
     # @return [self]
     #
     def validate(name = nil, **opts, &block)
-      local_validators << Validator.new(name, block, opts)
+      local_validators << Validator.new(name, block, **opts)
       self
     end
 
