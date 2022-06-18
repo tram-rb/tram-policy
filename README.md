@@ -6,7 +6,6 @@ Policy Object Pattern
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
 
 [![Gem Version][gem-badger]][gem]
-[![Build Status][travis-badger]][travis]
 [![Inline docs][inch-badger]][inch]
 
 ## Intro
@@ -340,7 +339,6 @@ The gem is available as open source under the terms of the [MIT License](http://
 [inch-badger]: http://inch-ci.org/github/tram-rb/tram-policy.svg
 [inch]: https://inch-ci.org/github/tram-rb/tram-policy
 [travis-badger]: https://img.shields.io/travis/tram-rb/tram-policy/master.svg?style=flat
-[travis]: https://travis-ci.org/tram-rb/tram-policy
 [active-model-validation]: http://api.rubyonrails.org/classes/ActiveModel/Validations.html
 [active-record-validation]: http://guides.rubyonrails.org/active_record_validations.html
 [dry-validation]: http://dry-rb.org/gems/dry-validation/
