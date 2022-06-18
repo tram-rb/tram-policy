@@ -41,7 +41,7 @@ class Tram::Policy
     # @return [String]
     #
     def message
-      key.is_a?(Symbol) ? I18n.t(*item) : key.to_s
+      key.is_a?(Symbol) ? I18n.t(key, **tags) : key.to_s
     end
 
     # Fetches an option

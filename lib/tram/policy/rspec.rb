@@ -6,7 +6,7 @@ RSpec::Matchers.define :be_invalid_at do |**tags|
   end
 
   def check(policy, tags)
-    @errors ||= policy.errors.filter(tags).map do |error|
+    @errors ||= policy.errors.filter(**tags).map do |error|
       { item: error.item }.tap do |obj|
         locales.each { |l| obj[l] = I18n.with_locale(l) { error.message } }
       end

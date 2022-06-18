@@ -1,5 +1,5 @@
 RSpec.describe Tram::Policy::Error do
-  subject(:error) { described_class.new :bad, options }
+  subject(:error) { described_class.new :bad, **options }
 
   let(:scope)   { %w[tram-policy] }
   let(:options) { { level: "warning", scope: scope } }
