@@ -3,7 +3,7 @@ AllCops:
   DisplayCopNames:    true
   DisplayStyleGuide:  true
   StyleGuideCopsOnly: true
-  TargetRubyVersion:  2.4
+  TargetRubyVersion:  3.0
 
 Lint/AmbiguousBlockAssociation:
   Enabled: false
